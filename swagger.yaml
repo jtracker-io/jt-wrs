@@ -1,0 +1,196 @@
+swagger: '2.0'
+info:
+  title: JTHub Workflow Registration Service API
+  version: "0.1"
+consumes:
+  - application/json
+produces:
+  - application/json
+security:
+  # enable OAuth protection for all REST endpoints
+  # (only active if the TOKENINFO_URL environment variable is set)
+  - oauth2: [uid]
+paths:
+  /{account_name}:
+    get:
+      tags: [Workflows]
+      operationId: app.get_workflows
+      summary: Get all workflows for an account
+      parameters:
+        - $ref: '#/parameters/account_name'
+      responses:
+        200:
+          description: Return workflows
+          schema:
+            type: array
+    post:
+      tags: [Workflows]
+      operationId: app.register_workflow
+      summary: Register a workflow under a JTHub account
+      parameters:
+        - $ref: '#/parameters/account_name'
+        - name: workflow
+          in: body
+          schema:
+            $ref: '#/definitions/Workflow'
+      responses:
+        200:
+          description: Workflow created
+          schema:
+            $ref: '#/definitions/Workflow'
+        409:
+          description: Workflow registration failed
+  /{account_name}/{workflow_name}:
+    get:
+      tags: [Workflows]
+      operationId: app.get_workflow
+      summary: Get detail for a workflow (including all versions)
+      parameters:
+        - $ref: '#/parameters/account_name'
+        - $ref: '#/parameters/workflow_name'
+      responses:
+        200:
+          description: Return workflow
+  /{account_name}/{workflow_name}/{workflow_ver}:
+    get:
+      tags: [Workflows]
+      operationId: app.get_workflow_ver
+      summary: Get detail for a workflow version
+      parameters:
+        - $ref: '#/parameters/account_name'
+        - $ref: '#/parameters/workflow_name'
+        - $ref: '#/parameters/workflow_ver'
+      responses:
+        200:
+          description: Return workflow
+        404:
+          description: Account does not exist
+  /{account_name}/{workflow_name}/{workflow_ver}/_release:
+    put:
+      tags: [Workflows]
+      operationId: app.release_workflow
+      summary: Release a workflow, no change is permitted once released.
+      parameters:
+        - $ref: '#/parameters/account_name'
+        - $ref: '#/parameters/workflow_name'
+        - $ref: '#/parameters/workflow_ver'
+      responses:
+        200:
+          description: Return workflows
+  /{account_name}/{workflow_name}/{workflow_ver}/_validate_job_json:
+    post:
+      tags: [Job JSON]
+      operationId: app.validate_job_json
+      summary: Update an account
+      parameters:
+        - $ref: '#/parameters/account_name'
+        - $ref: '#/parameters/workflow_name'
+        - $ref: '#/parameters/workflow_ver'
+        - name: job_json
+          in: body
+          schema:
+            $ref: '#/definitions/JobJSON'
+      responses:
+        200:
+          description: Job JSON valid
+        400:
+          description: Job JSON invalid
+  /{account_name}/{workflow_name}/{workflow_ver}/_download:
+    put:
+      tags: [Workflows]
+      operationId: app.download_workflow
+      summary: Download workflow package
+      parameters:
+        - $ref: '#/parameters/account_name'
+        - $ref: '#/parameters/workflow_name'
+        - $ref: '#/parameters/workflow_ver'
+      responses:
+        200:
+          description: Workflow package downloaded
+
+
+parameters:
+  account_name:
+    name: account_name
+    description: Account's unique name
+    in: path
+    type: string
+    required: true
+    pattern: "^[a-zA-Z0-9-_]{3,30}$"  # UUID pattern
+  workflow_name:
+    name: workflow_name
+    description: Workflow's name
+    in: path
+    type: string
+    required: true
+    pattern: "^[a-zA-Z0-9-_]{3,30}$"
+  workflow_ver:
+    name: workflow_ver
+    description: Workflow's version
+    in: path
+    type: string
+    required: true
+    pattern: "^[a-zA-Z0-9-_.]{2,30}$"
+
+
+definitions:
+  Workflow:
+    type: object
+    required:
+      - _name
+    properties:
+      _id:
+        type: string
+        description: Workflow's unique identifier
+        pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        example: "7ebf7fa9-f70f-481a-a499-5fba3f8c5078"
+        readOnly: true
+      _name:
+        type: string
+        description: Workflow's name
+        pattern: "^[a-zA-Z0-9-_]{3,30}$"
+        example: "BWA-MEM"
+        minLength: 3
+        maxLength: 30
+      workflow_type:
+        type: string
+        description: In which language workflow is written
+        enum: ["JTracker"]
+        example: "JTracker"
+        readOnly: true
+      tags:
+        type: object
+        description: Custom tags
+      created:
+        type: string
+        format: date-time
+        description: Creation time
+        example: "2015-07-07T15:49:51.230+02:00"
+        readOnly: true
+  JobJSON:
+    type: object
+    required:
+      - _name
+    properties:
+      _id:
+        type: string
+        description: Workflow's unique identifier
+        pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        example: "7ebf7fa9-f70f-481a-a499-5fba3f8c5078"
+        readOnly: true
+      _name:
+        type: string
+        description: Workflow's name
+        pattern: "^[a-zA-Z0-9-_]{3,35}$"
+        example: "BWA-MEM"
+        minLength: 3
+        maxLength: 35
+
+
+securityDefinitions:
+  oauth2:
+    type: oauth2
+    flow: implicit
+    authorizationUrl: https://example.com/oauth2/dialog
+    scopes:
+      uid: Unique identifier of the user accessing the service.
