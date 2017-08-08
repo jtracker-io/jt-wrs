@@ -3,7 +3,7 @@ import connexion
 import datetime
 import logging
 import jt_wrs
-from jt_wrs.exceptions import AccountNameNotFound
+from jt_wrs.exceptions import AccountNameNotFound, AMSNotAvailable
 from connexion import NoContent
 
 
@@ -12,18 +12,32 @@ def get_workflows(account_name):
         workflows = jt_wrs.get_workflows(account_name)
     except AccountNameNotFound as err:
         return str(err), 404
+    except AMSNotAvailable as err:
+        return str(err), 500
 
     return workflows or ('No workflow found', 404)
 
 
 def get_workflow(account_name, workflow_name):
-    account = jt_wrs.get_workflow(account_name, workflow_name)
-    return account or ('No workflow found', 404)
+    try:
+        workflow = jt_wrs.get_workflow(account_name, workflow_name)
+    except AccountNameNotFound as err:
+        return str(err), 404
+    except AMSNotAvailable as err:
+        return str(err), 500
+
+    return workflow or ('No workflow found', 404)
 
 
 def get_workflow_ver(account_name, workflow_name, workflow_version):
-    account = jt_wrs.get_workflow(account_name, workflow_name, workflow_version)
-    return account or ('No workflow found', 404)
+    try:
+        workflow = jt_wrs.get_workflow(account_name, workflow_name, workflow_version)
+    except AccountNameNotFound as err:
+        return str(err), 404
+    except AMSNotAvailable as err:
+        return str(err), 500
+
+    return workflow or ('No workflow found', 404)
 
 
 def register_workflow(account_name, account_type='org'):

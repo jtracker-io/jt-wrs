@@ -2,7 +2,7 @@ import etcd3
 import uuid
 import requests
 import json
-from .exceptions import AccountNameNotFound
+from .exceptions import AccountNameNotFound, AMSNotAvailable
 
 # settings, need to move out to config
 
@@ -17,7 +17,7 @@ def _get_account_id_by_name(account_name):
     try:
         r = requests.get(request_url)
     except:
-        return
+        raise AMSNotAvailable('AMS service unavailable')
 
     if r.status_code != 200:
         raise AccountNameNotFound(account_name)
