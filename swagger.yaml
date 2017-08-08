@@ -51,7 +51,7 @@ paths:
       responses:
         200:
           description: Return workflow
-  /{account_name}/{workflow_name}/{workflow_ver}:
+  /{account_name}/{workflow_name}/{workflow_version}:
     get:
       tags: [Workflows]
       operationId: app.get_workflow_ver
@@ -59,13 +59,13 @@ paths:
       parameters:
         - $ref: '#/parameters/account_name'
         - $ref: '#/parameters/workflow_name'
-        - $ref: '#/parameters/workflow_ver'
+        - $ref: '#/parameters/workflow_version'
       responses:
         200:
           description: Return workflow
         404:
           description: Account does not exist
-  /{account_name}/{workflow_name}/{workflow_ver}/_release:
+  /{account_name}/{workflow_name}/{workflow_version}/_release:
     put:
       tags: [Workflows]
       operationId: app.release_workflow
@@ -73,11 +73,11 @@ paths:
       parameters:
         - $ref: '#/parameters/account_name'
         - $ref: '#/parameters/workflow_name'
-        - $ref: '#/parameters/workflow_ver'
+        - $ref: '#/parameters/workflow_version'
       responses:
         200:
           description: Return workflows
-  /{account_name}/{workflow_name}/{workflow_ver}/_validate_job_json:
+  /{account_name}/{workflow_name}/{workflow_version}/_validate_job_json:
     post:
       tags: [Job JSON]
       operationId: app.validate_job_json
@@ -85,7 +85,7 @@ paths:
       parameters:
         - $ref: '#/parameters/account_name'
         - $ref: '#/parameters/workflow_name'
-        - $ref: '#/parameters/workflow_ver'
+        - $ref: '#/parameters/workflow_version'
         - name: job_json
           in: body
           schema:
@@ -95,7 +95,7 @@ paths:
           description: Job JSON valid
         400:
           description: Job JSON invalid
-  /{account_name}/{workflow_name}/{workflow_ver}/_download:
+  /{account_name}/{workflow_name}/{workflow_version}/_download:
     put:
       tags: [Workflows]
       operationId: app.download_workflow
@@ -103,7 +103,7 @@ paths:
       parameters:
         - $ref: '#/parameters/account_name'
         - $ref: '#/parameters/workflow_name'
-        - $ref: '#/parameters/workflow_ver'
+        - $ref: '#/parameters/workflow_version'
       responses:
         200:
           description: Workflow package downloaded
@@ -124,8 +124,8 @@ parameters:
     type: string
     required: true
     pattern: "^[a-zA-Z0-9-_]{3,30}$"
-  workflow_ver:
-    name: workflow_ver
+  workflow_version:
+    name: workflow_version
     description: Workflow's version
     in: path
     type: string

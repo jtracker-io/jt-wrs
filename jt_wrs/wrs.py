@@ -12,7 +12,7 @@ WRS_ETCD_ROOT = '/jthub:wrs'
 etcd_client = etcd3.client()
 
 
-def get_account_id_by_name(account_name):
+def _get_account_id_by_name(account_name):
     request_url = '%s/accounts/%s' % (AMS_URL.strip('/'), account_name)
     try:
         r = requests.get(request_url)
@@ -25,80 +25,85 @@ def get_account_id_by_name(account_name):
     return json.loads(r.text).get('_id')
 
 
-def get_workflows(account_name):
-    account_id = get_account_id_by_name(account_name)
+def get_workflows(account_name, workflow_name=None, workflow_version=None):
+    account_id = _get_account_id_by_name(account_name)
 
     if account_id:
-        workflows = {
-            "account_id": account_id,
-            "account_name": account_name,
-            "workflows": []
-        }
+        workflows = {}
 
         key_prefix = '/'.join([WRS_ETCD_ROOT,
-                               'account._id:%s' % account_id])
+                               'account._id:%s/' % account_id])
 
-        # ideally we don't read values yet
-        r = etcd_client.get_prefix(key_prefix=key_prefix, sort_target='KEY')
+        # ideally we don't read values yet, but python-etcd does not have this option
+        r = etcd_client.get_prefix(key_prefix=key_prefix +
+                                              ('' if not workflow_name else 'workflow._name:%s/' % workflow_name),
+                                   sort_target='KEY')
 
         for value, meta in r:
             k = meta.key.decode('utf-8').replace(key_prefix, '', 1)
             try:
                 v = value.decode("utf-8")
             except:
-                v = None  # assume binary value
+                v = None  # assume binary value, deal with it later
             print(k, v)
+            parts = k.split('/')
 
-            if ':' in k:
-                if k.startswith('is_'):
-                    v = True if k.split(':', 1)[1] else False
-                else:
-                    k, v = k.split(':', 1)
+            new_key, _name = parts[0].split(':', 1)
+            if new_key == 'workflow._name' and not workflows.get(_name):
+                workflows[_name] = {}
+
+            if ':' in parts[-1]:
+                new_key, new_value = parts[-1].split(':', 1)
             else:
-                if k.startswith('is_'):
-                    v = True if v and v != '0' else False
+                new_key, new_value = parts[-1], v
 
-        return workflows
+            if isinstance(new_value, str):
+                new_value = new_value.replace('+', '/')
+
+            if new_key.startswith('is_'):
+                new_value = True if new_value and new_value != '0' else False
+
+            if len(parts) == 2:
+                if '@' not in new_key:
+                    workflows[_name][new_key] = new_value
+                else:
+                    sub_key, sub_type = new_key.split('@', 1)
+                    if not sub_type in workflows[_name]: workflows[_name][sub_type] = []
+                    workflows[_name][sub_type].append({sub_key: new_value})
+
+            elif len(parts) == 3:
+                ver_tag, ver = parts[1].split(':', 1)
+                if workflow_version and not workflow_version == ver:
+                    continue
+
+                ver = 'ver:%s' % ver
+                if ver_tag == 'ver' and not workflows[_name].get(ver):
+                    workflows[_name][ver] = {}
+
+                if '@' not in new_key:
+                    workflows[_name][ver][new_key] = new_value
+                else:
+                    sub_key, sub_type = new_key.split('@', 1)
+                    if not sub_type in workflows[_name][ver]: workflows[_name][ver][sub_type] = []
+                    workflows[_name][ver][sub_type].append({sub_key: new_value})
+
+        ret = []
+        for w in workflows:
+            workflow = workflows[w]
+            workflow.update({'workflow_name': w})
+            ret.append(workflow)
+
+        return ret
     else:
         raise AccountNameNotFound(Exception("Specific account name not found: %s" % account_name))
 
 
-def get_workflow(account_name, workflow_name):
-    key = '/'.join([WRS_ETCD_ROOT, '%s:%s' % ('_name', account_name)])
-    r = etcd_client.get(key)
-
-    try:
-        _id = r[0].decode("utf-8")
-    except:
+def get_workflow(account_name, workflow_name, workflow_version=None):
+    workflow = get_workflows(account_name, workflow_name, workflow_version)
+    if workflow_version and 'ver:%s' % workflow_version not in workflow[0]:
         return
-
-    account = {
-        '_id': _id
-    }
-
-    key_prefix = '/'.join([AMS_ROOT, ACCOUNT_PATH, 'data', '%s:%s/' % ('_id', _id)])
-    r = etcd_client.get_prefix(key_prefix=key_prefix, sort_target='KEY')
-
-    for value, meta in r:
-        k = meta.key.decode('utf-8').replace(key_prefix, '', 1)
-        v = value.decode("utf-8")
-        if ':' in k:
-            if k.startswith('is_'):
-                v = True if k.split(':', 1)[1] else False
-            else:
-                k, v = k.split(':', 1)
-        else:
-            if k.startswith('is_'):
-                v = True if v else False
-
-        if not '@' in k:
-            account[k] = v
-        else:
-            sub_key, sub_type = k.split('@', 1)
-            if not sub_type in account: account[sub_type] = []
-            account[sub_type].append({sub_key: v})
-
-    return account
+    elif workflow:
+        return workflow[0]
 
 
 def register_workflow(account_name, account_type):

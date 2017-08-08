@@ -13,17 +13,17 @@ def get_workflows(account_name):
     except AccountNameNotFound as err:
         return str(err), 404
 
-    return workflows or ('Not found', 404)
+    return workflows or ('No workflow found', 404)
 
 
 def get_workflow(account_name, workflow_name):
-    account = jt_wrs.get_workflow(account_name)
-    return account or ('Not found', 404)
+    account = jt_wrs.get_workflow(account_name, workflow_name)
+    return account or ('No workflow found', 404)
 
 
 def get_workflow_ver(account_name, workflow_name, workflow_version):
-    account = jt_wrs.get_workflow(account_name)
-    return account or ('Not found', 404)
+    account = jt_wrs.get_workflow(account_name, workflow_name, workflow_version)
+    return account or ('No workflow found', 404)
 
 
 def register_workflow(account_name, account_type='org'):
