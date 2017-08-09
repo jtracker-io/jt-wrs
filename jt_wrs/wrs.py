@@ -50,7 +50,7 @@ def get_workflows(account_name, workflow_name=None, workflow_version=None):
             except:
                 v = None  # assume binary value, deal with it later
 
-            print("k:%s, v:%s" % (k, v))
+            #print("k:%s, v:%s" % (k, v))
 
             workflow_name = k.strip('_name:').rstrip('/_id')
             workflow_id = v
@@ -71,7 +71,7 @@ def get_workflows(account_name, workflow_name=None, workflow_version=None):
                     v = value2.decode("utf-8")
                 except:
                     v = None  # assume binary value, deal with it later
-                print("k:%s, v:%s" % (k, v))
+                #print("k:%s, v:%s" % (k, v))
                 parts = k.split('/')
 
                 if ':' in parts[-1]:

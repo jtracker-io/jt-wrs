@@ -52,7 +52,7 @@ def release_workflow(account_name, workflow_name, workflow_version):
     pass
 
 
-def validate_job_json(account_name, workflow_name, workflow_version):
+def validate_job_file(account_name, workflow_name, workflow_version):
     pass
 
 

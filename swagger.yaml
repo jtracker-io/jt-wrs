@@ -77,10 +77,10 @@ paths:
       responses:
         200:
           description: Return workflows
-  /{account_name}/{workflow_name}/{workflow_version}/_validate_job_json:
+  /{account_name}/{workflow_name}/{workflow_version}/_validate_job_file:
     post:
-      tags: [Job JSON]
-      operationId: app.validate_job_json
+      tags: [Job File]
+      operationId: app.validate_job_file
       summary: Update an account
       parameters:
         - $ref: '#/parameters/account_name'
@@ -89,7 +89,7 @@ paths:
         - name: job_json
           in: body
           schema:
-            $ref: '#/definitions/JobJSON'
+            $ref: '#/definitions/JobFile'
       responses:
         200:
           description: Job JSON valid
@@ -167,7 +167,7 @@ definitions:
         description: Creation time
         example: "2015-07-07T15:49:51.230+02:00"
         readOnly: true
-  JobJSON:
+  JobFile:
     type: object
     required:
       - _name
