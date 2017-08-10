@@ -26,7 +26,7 @@ paths:
     post:
       tags: [Workflows]
       operationId: app.register_workflow
-      summary: Register a workflow under a JTHub account
+      summary: Register a workflow under an account
       parameters:
         - $ref: '#/parameters/account_name'
         - name: workflow
@@ -55,7 +55,7 @@ paths:
     get:
       tags: [Workflows]
       operationId: app.get_workflow_ver
-      summary: Get detail for a workflow version
+      summary: Get detail for a workflow with specific version
       parameters:
         - $ref: '#/parameters/account_name'
         - $ref: '#/parameters/workflow_name'
