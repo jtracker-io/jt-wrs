@@ -25,6 +25,11 @@ def _get_account_id_by_name(account_name):
     return json.loads(r.text).get('_id')
 
 
+def _get_workflow_id_by_account_id_and_workflow_name(account_id, workflow_name):
+    v, meta = etcd_client.get('%s/account._id:%s/workflow/_name:%s/_id' % (WRS_ETCD_ROOT, account_id, workflow_name ))
+    if v:
+        return v.decode("utf-8")
+
 def get_workflows(account_name, workflow_name=None, workflow_version=None):
     account_id = _get_account_id_by_name(account_name)
 
@@ -122,6 +127,30 @@ def get_workflow(account_name, workflow_name, workflow_version=None):
         return
     elif workflow:
         return workflow[0]
+
+
+def get_file(account_name, workflow_name, workflow_version, file_type):
+    if file_type not in ('workflowfile', 'workflow_package'):
+        return
+
+    account_id = _get_account_id_by_name(account_name)
+
+    if account_id:
+        workflow_id = _get_workflow_id_by_account_id_and_workflow_name(account_id, workflow_name)
+        print(workflow_id)
+        if workflow_id:
+            v, meta = etcd_client.get('%s/workflow/_id:%s/ver:%s/%s' %
+                                      (WRS_ETCD_ROOT, workflow_id, workflow_version, file_type))
+            if v:
+                return v.decode("utf-8") if file_type == 'workflowfile' else v
+
+
+def get_workflowfile(account_name, workflow_name, workflow_version):
+    return get_file(account_name, workflow_name, workflow_version, 'workflowfile')
+
+
+def get_workflow_package(account_name, workflow_name, workflow_version):
+    return get_file(account_name, workflow_name, workflow_version, 'workflow_package')
 
 
 def register_workflow(account_name, account_type):

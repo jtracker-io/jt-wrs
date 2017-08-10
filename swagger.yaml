@@ -69,7 +69,7 @@ paths:
     put:
       tags: [Workflows]
       operationId: app.release_workflow
-      summary: Release a workflow, no change is permitted once released.
+      summary: Release a workflow, no change is permitted once released
       parameters:
         - $ref: '#/parameters/account_name'
         - $ref: '#/parameters/workflow_name'
@@ -77,10 +77,10 @@ paths:
       responses:
         200:
           description: Return workflows
-  /workflows/{account_name}/{workflow_name}/{workflow_version}/_validate_job_file:
+  /workflows/{account_name}/{workflow_name}/{workflow_version}/_validate_jobfile:
     post:
-      tags: [Job File]
-      operationId: app.validate_job_file
+      tags: [Jobfile]
+      operationId: app.validate_jobfile
       summary: Update an account
       parameters:
         - $ref: '#/parameters/account_name'
@@ -95,11 +95,25 @@ paths:
           description: Job JSON valid
         400:
           description: Job JSON invalid
-  /workflows/{account_name}/{workflow_name}/{workflow_version}/_download:
-    put:
+  /workflows/{account_name}/{workflow_name}/{workflow_version}/_workflowfile:
+    get:
       tags: [Workflows]
-      operationId: app.download_workflow
+      operationId: app.download_workflowfile
+      summary: Download workflow file
+      parameters:
+        - $ref: '#/parameters/account_name'
+        - $ref: '#/parameters/workflow_name'
+        - $ref: '#/parameters/workflow_version'
+      responses:
+        200:
+          description: Workflow file downloaded
+  /workflows/{account_name}/{workflow_name}/{workflow_version}/_workflow_package:
+    get:
+      tags: [Workflows]
+      operationId: app.download_workflow_package
       summary: Download workflow package
+      produces:
+        - "application/octet-stream"
       parameters:
         - $ref: '#/parameters/account_name'
         - $ref: '#/parameters/workflow_name'
@@ -107,6 +121,8 @@ paths:
       responses:
         200:
           description: Workflow package downloaded
+          schema:
+            type: file
 
 
 parameters:

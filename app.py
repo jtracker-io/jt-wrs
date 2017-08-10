@@ -52,12 +52,17 @@ def release_workflow(account_name, workflow_name, workflow_version):
     pass
 
 
-def validate_job_file(account_name, workflow_name, workflow_version):
+def validate_jobfile(account_name, workflow_name, workflow_version):
     pass
 
 
-def download_workflow(account_name, workflow_name, workflow_version):
-    pass
+def download_workflowfile(account_name, workflow_name, workflow_version):
+    workflowfile = jt_wrs.get_workflowfile(account_name, workflow_name, workflow_version)
+    return workflowfile or ('No workflowfile found', 404)
+
+def download_workflow_package(account_name, workflow_name, workflow_version):
+    workflow_package = jt_wrs.get_workflow_package(account_name, workflow_name, workflow_version)
+    return workflow_package or ('No workflow package found', 404)
 
 
 logging.basicConfig(level=logging.INFO)
