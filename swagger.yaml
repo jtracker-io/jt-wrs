@@ -11,7 +11,7 @@ security:
   # (only active if the TOKENINFO_URL environment variable is set)
   - oauth2: [uid]
 paths:
-  /{account_name}:
+  /workflows/{account_name}:
     get:
       tags: [Workflows]
       operationId: app.get_workflows
@@ -40,7 +40,7 @@ paths:
             $ref: '#/definitions/Workflow'
         409:
           description: Workflow registration failed
-  /{account_name}/{workflow_name}:
+  /workflows/{account_name}/{workflow_name}:
     get:
       tags: [Workflows]
       operationId: app.get_workflow
@@ -51,7 +51,7 @@ paths:
       responses:
         200:
           description: Return workflow
-  /{account_name}/{workflow_name}/{workflow_version}:
+  /workflows/{account_name}/{workflow_name}/{workflow_version}:
     get:
       tags: [Workflows]
       operationId: app.get_workflow_ver
@@ -65,7 +65,7 @@ paths:
           description: Return workflow
         404:
           description: Account does not exist
-  /{account_name}/{workflow_name}/{workflow_version}/_release:
+  /workflows/{account_name}/{workflow_name}/{workflow_version}/_release:
     put:
       tags: [Workflows]
       operationId: app.release_workflow
@@ -77,7 +77,7 @@ paths:
       responses:
         200:
           description: Return workflows
-  /{account_name}/{workflow_name}/{workflow_version}/_validate_job_file:
+  /workflows/{account_name}/{workflow_name}/{workflow_version}/_validate_job_file:
     post:
       tags: [Job File]
       operationId: app.validate_job_file
@@ -95,7 +95,7 @@ paths:
           description: Job JSON valid
         400:
           description: Job JSON invalid
-  /{account_name}/{workflow_name}/{workflow_version}/_download:
+  /workflows/{account_name}/{workflow_name}/{workflow_version}/_download:
     put:
       tags: [Workflows]
       operationId: app.download_workflow
