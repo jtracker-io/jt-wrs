@@ -153,15 +153,15 @@ definitions:
   Workflow:
     type: object
     required:
-      - _name
+      - name
     properties:
-      _id:
+      id:
         type: string
         description: Workflow's unique identifier
         pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
         example: "7ebf7fa9-f70f-481a-a499-5fba3f8c5078"
         readOnly: true
-      _name:
+      name:
         type: string
         description: Workflow's name
         pattern: "^[a-zA-Z0-9-_]{3,30}$"
@@ -186,15 +186,15 @@ definitions:
   JobFile:
     type: object
     required:
-      - _name
+      - name
     properties:
-      _id:
+      id:
         type: string
         description: Workflow's unique identifier
         pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
         example: "7ebf7fa9-f70f-481a-a499-5fba3f8c5078"
         readOnly: true
-      _name:
+      name:
         type: string
         description: Workflow's name
         pattern: "^[a-zA-Z0-9-_]{3,35}$"
