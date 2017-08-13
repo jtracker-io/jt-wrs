@@ -14,8 +14,11 @@ def get_workflows(account_name):
         return str(err), 404
     except AMSNotAvailable as err:
         return str(err), 500
-
     return workflows or ('No workflow found', 404)
+
+
+def get_workflow_by_id(workflow_id, workflow_version=None):
+    return jt_wrs.get_workflow_by_id(workflow_id, workflow_version) or ('No workflow found', 404)
 
 
 def get_workflow(account_name, workflow_name):

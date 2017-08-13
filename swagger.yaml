@@ -11,6 +11,23 @@ security:
   # (only active if the TOKENINFO_URL environment variable is set)
   - oauth2: [uid]
 paths:
+  /workflows/workflow_id/{workflow_id}:
+    get:
+      tags: [Workflows]
+      operationId: app.get_workflow_by_id
+      summary: Get workflow by workflow ID
+      parameters:
+        - $ref: '#/parameters/workflow_id'
+        - name: workflow_version
+          description: Workflow's version
+          in: query
+          type: string
+          pattern: "^[a-zA-Z0-9-_.]{2,30}$"
+      responses:
+        200:
+          description: Return workflows
+          schema:
+            type: array
   /workflows/{account_name}:
     get:
       tags: [Workflows]
@@ -133,6 +150,13 @@ parameters:
     type: string
     required: true
     pattern: "^[a-zA-Z0-9-_]{3,30}$"  # UUID pattern
+  workflow_id:
+    name: workflow_id
+    description: Workflow's unique ID
+    in: path
+    type: string
+    required: true
+    pattern: "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
   workflow_name:
     name: workflow_name
     description: Workflow's name
