@@ -70,7 +70,7 @@ def get_workflows(account_name=None, workflow_name=None, workflow_version=None):
 
             #print("k:%s, v:%s" % (k, v))
 
-            workflow = get_workflow_by_id(v, workflow_version, workflow_owner=account_name)
+            workflow = get_workflow_by_id(v, workflow_version, owner_name=account_name)
 
             if workflow:
                 workflows.append(workflow)
@@ -80,7 +80,7 @@ def get_workflows(account_name=None, workflow_name=None, workflow_version=None):
         raise AccountNameNotFound(Exception("Specific account name not found: %s" % account_name))
 
 
-def get_workflow_by_id(workflow_id, workflow_version=None, workflow_owner=None):
+def get_workflow_by_id(workflow_id, workflow_version=None, owner_name=None):
     workflow = {
         "id": workflow_id
     }
@@ -116,6 +116,8 @@ def get_workflow_by_id(workflow_id, workflow_version=None, workflow_owner=None):
 
         if len(parts) == 1:
             if '@' not in new_key:
+                if new_key == 'account.id':
+                    new_key = 'owner.id'
                 workflow[new_key] = new_value
             else:
                 sub_key, sub_type = new_key.split('@', 1)
@@ -141,10 +143,10 @@ def get_workflow_by_id(workflow_id, workflow_version=None, workflow_owner=None):
                 workflow[ver][sub_type].append({sub_key: new_value})
 
     if workflow_version_found:
-        if workflow_owner:
-            workflow['account.name'] = workflow_owner
+        if owner_name:
+            workflow['owner.name'] = owner_name
         else:
-            workflow['account.name'] = _get_account_name_by_id(workflow.get('account.id'))
+            workflow['owner.name'] = _get_account_name_by_id(workflow.get('owner.id'))
         return workflow
 
 
