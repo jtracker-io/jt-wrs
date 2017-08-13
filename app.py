@@ -3,14 +3,14 @@ import connexion
 import datetime
 import logging
 import jt_wrs
-from jt_wrs.exceptions import AccountNameNotFound, AMSNotAvailable
+from jt_wrs.exceptions import OwnerNameNotFound, AMSNotAvailable
 from connexion import NoContent
 
 
-def get_workflows(account_name):
+def get_workflows(owner_name):
     try:
-        workflows = jt_wrs.get_workflows(account_name)
-    except AccountNameNotFound as err:
+        workflows = jt_wrs.get_workflows(owner_name)
+    except OwnerNameNotFound as err:
         return str(err), 404
     except AMSNotAvailable as err:
         return str(err), 500
@@ -21,10 +21,10 @@ def get_workflow_by_id(workflow_id, workflow_version=None):
     return jt_wrs.get_workflow_by_id(workflow_id, workflow_version) or ('No workflow found', 404)
 
 
-def get_workflow(account_name, workflow_name):
+def get_workflow(owner_name, workflow_name):
     try:
-        workflow = jt_wrs.get_workflow(account_name, workflow_name)
-    except AccountNameNotFound as err:
+        workflow = jt_wrs.get_workflow(owner_name, workflow_name)
+    except OwnerNameNotFound as err:
         return str(err), 404
     except AMSNotAvailable as err:
         return str(err), 500
@@ -32,10 +32,10 @@ def get_workflow(account_name, workflow_name):
     return workflow or ('No workflow found', 404)
 
 
-def get_workflow_ver(account_name, workflow_name, workflow_version):
+def get_workflow_ver(owner_name, workflow_name, workflow_version):
     try:
-        workflow = jt_wrs.get_workflow(account_name, workflow_name, workflow_version)
-    except AccountNameNotFound as err:
+        workflow = jt_wrs.get_workflow(owner_name, workflow_name, workflow_version)
+    except OwnerNameNotFound as err:
         return str(err), 404
     except AMSNotAvailable as err:
         return str(err), 500
@@ -43,28 +43,28 @@ def get_workflow_ver(account_name, workflow_name, workflow_version):
     return workflow or ('No workflow found', 404)
 
 
-def register_workflow(account_name, account_type='org'):
-    exists = jt_wrs.get_account(account_name)
+def register_workflow(owner_name, owner_type='org'):
+    exists = jt_wrs.get_owner(owner_name)
     if exists:
         return NoContent, 409
     else:
-        return jt_wrs.create_account(account_name, account_type)
+        return jt_wrs.create_owner(owner_name, owner_type)
 
 
-def release_workflow(account_name, workflow_name, workflow_version):
+def release_workflow(owner_name, workflow_name, workflow_version):
     pass
 
 
-def validate_jobfile(account_name, workflow_name, workflow_version):
+def validate_jobfile(owner_name, workflow_name, workflow_version):
     pass
 
 
-def download_workflowfile(account_name, workflow_name, workflow_version):
-    workflowfile = jt_wrs.get_workflowfile(account_name, workflow_name, workflow_version)
+def download_workflowfile(owner_name, workflow_name, workflow_version):
+    workflowfile = jt_wrs.get_workflowfile(owner_name, workflow_name, workflow_version)
     return workflowfile or ('No workflowfile found', 404)
 
-def download_workflow_package(account_name, workflow_name, workflow_version):
-    workflow_package = jt_wrs.get_workflow_package(account_name, workflow_name, workflow_version)
+def download_workflow_package(owner_name, workflow_name, workflow_version):
+    workflow_package = jt_wrs.get_workflow_package(owner_name, workflow_name, workflow_version)
     return workflow_package or ('No workflow package found', 404)
 
 

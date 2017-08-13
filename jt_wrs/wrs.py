@@ -2,7 +2,7 @@ import etcd3
 import uuid
 import requests
 import json
-from .exceptions import AccountNameNotFound, AMSNotAvailable, AccountIDNotFound
+from .exceptions import OwnerNameNotFound, AMSNotAvailable, OwnerIDNotFound
 
 # settings, need to move out to config
 
@@ -12,46 +12,46 @@ WRS_ETCD_ROOT = '/jthub:wrs'
 etcd_client = etcd3.client()
 
 
-def _get_account_id_by_name(account_name):
-    request_url = '%s/accounts/%s' % (AMS_URL.strip('/'), account_name)
+def _get_owner_id_by_name(owner_name):
+    request_url = '%s/accounts/%s' % (AMS_URL.strip('/'), owner_name)
     try:
         r = requests.get(request_url)
     except:
         raise AMSNotAvailable('AMS service unavailable')
 
     if r.status_code != 200:
-        raise AccountNameNotFound(account_name)
+        raise OwnerNameNotFound(owner_name)
 
     return json.loads(r.text).get('id')
 
 
-def _get_account_name_by_id(account_id):
-    request_url = '%s/accounts/account_id/%s' % (AMS_URL.strip('/'), account_id)
+def _get_owner_name_by_id(owner_id):
+    request_url = '%s/accounts/account_id/%s' % (AMS_URL.strip('/'), owner_id)
     try:
         r = requests.get(request_url)
     except:
         raise AMSNotAvailable('AMS service unavailable')
 
     if r.status_code != 200:
-        raise AccountIDNotFound(account_id)
+        raise OwnerIDNotFound(owner_id)
 
     return json.loads(r.text).get('name')
 
 
-def _get_workflow_id_by_account_id_and_workflow_name(account_id, workflow_name):
-    v, meta = etcd_client.get('%s/account.id:%s/workflow/name:%s/id' % (WRS_ETCD_ROOT, account_id, workflow_name ))
+def _get_workflow_id_by_owner_id_and_workflow_name(owner_id, workflow_name):
+    v, meta = etcd_client.get('%s/owner.id:%s/workflow/name:%s/id' % (WRS_ETCD_ROOT, owner_id, workflow_name ))
     if v:
         return v.decode("utf-8")
 
-def get_workflows(account_name=None, workflow_name=None, workflow_version=None):
-    account_id = _get_account_id_by_name(account_name)
+def get_workflows(owner_name=None, workflow_name=None, workflow_version=None):
+    owner_id = _get_owner_id_by_name(owner_name)
 
-    if account_id:
+    if owner_id:
         workflows = []
 
         # find the workflows' name and id first
         workflow_name_id_prefix = '/'.join([WRS_ETCD_ROOT,
-                                            'account.id:%s' % account_id,
+                                            'owner.id:%s' % owner_id,
                                             'workflow/'])
 
         if workflow_name:
@@ -70,14 +70,14 @@ def get_workflows(account_name=None, workflow_name=None, workflow_version=None):
 
             #print("k:%s, v:%s" % (k, v))
 
-            workflow = get_workflow_by_id(v, workflow_version, owner_name=account_name)
+            workflow = get_workflow_by_id(v, workflow_version, owner_name=owner_name)
 
             if workflow:
                 workflows.append(workflow)
 
         return workflows
     else:
-        raise AccountNameNotFound(Exception("Specific account name not found: %s" % account_name))
+        raise OwnerNameNotFound(Exception("Specific owner name not found: %s" % owner_name))
 
 
 def get_workflow_by_id(workflow_id, workflow_version=None, owner_name=None):
@@ -116,12 +116,11 @@ def get_workflow_by_id(workflow_id, workflow_version=None, owner_name=None):
 
         if len(parts) == 1:
             if '@' not in new_key:
-                if new_key == 'account.id':
-                    new_key = 'owner.id'
                 workflow[new_key] = new_value
             else:
                 sub_key, sub_type = new_key.split('@', 1)
-                if not sub_type in workflow: workflow[sub_type] = []
+                if sub_type not in workflow:
+                    workflow[sub_type] = []
                 workflow[sub_type].append({sub_key: new_value})
 
         elif len(parts) == 2:
@@ -146,26 +145,26 @@ def get_workflow_by_id(workflow_id, workflow_version=None, owner_name=None):
         if owner_name:
             workflow['owner.name'] = owner_name
         else:
-            workflow['owner.name'] = _get_account_name_by_id(workflow.get('owner.id'))
+            workflow['owner.name'] = _get_owner_name_by_id(workflow.get('owner.id'))
         return workflow
 
 
-def get_workflow(account_name, workflow_name, workflow_version=None):
-    workflow = get_workflows(account_name, workflow_name, workflow_version)
+def get_workflow(owner_name, workflow_name, workflow_version=None):
+    workflow = get_workflows(owner_name, workflow_name, workflow_version)
     if workflow and workflow_version and 'ver:%s' % workflow_version not in workflow[0]:
         return
     elif workflow:
         return workflow[0]
 
 
-def get_file(account_name, workflow_name, workflow_version, file_type):
+def get_file(owner_name, workflow_name, workflow_version, file_type):
     if file_type not in ('workflowfile', 'workflow_package'):
         return
 
-    account_id = _get_account_id_by_name(account_name)
+    owner_id = _get_owner_id_by_name(owner_name)
 
-    if account_id:
-        workflow_id = _get_workflow_id_by_account_id_and_workflow_name(account_id, workflow_name)
+    if owner_id:
+        workflow_id = _get_workflow_id_by_owner_id_and_workflow_name(owner_id, workflow_name)
         #print(workflow_id)
         if workflow_id:
             v, meta = etcd_client.get('%s/workflow/id:%s/ver:%s/%s' %
@@ -174,36 +173,36 @@ def get_file(account_name, workflow_name, workflow_version, file_type):
                 return v.decode("utf-8") if file_type == 'workflowfile' else v
 
 
-def get_workflowfile(account_name, workflow_name, workflow_version):
-    return get_file(account_name, workflow_name, workflow_version, 'workflowfile')
+def get_workflowfile(owner_name, workflow_name, workflow_version):
+    return get_file(owner_name, workflow_name, workflow_version, 'workflowfile')
 
 
-def get_workflow_package(account_name, workflow_name, workflow_version):
-    return get_file(account_name, workflow_name, workflow_version, 'workflow_package')
+def get_workflow_package(owner_name, workflow_name, workflow_version):
+    return get_file(owner_name, workflow_name, workflow_version, 'workflow_package')
 
 
-def register_workflow(account_name, account_type):
+def register_workflow(owner_name, owner_type):
     id = str(uuid.uuid4())
 
-    key = '/'.join([AMS_ROOT, ACCOUNT_PATH, '%s:%s' % ('name', account_name)])
+    key = '/'.join([AMS_ROOT, ACCOUNT_PATH, '%s:%s' % ('name', owner_name)])
     r = etcd_client.put(key, id)
 
     key_prefix = '/'.join([AMS_ROOT, ACCOUNT_PATH, 'data', '%s:%s' % ('id', id)])
-    r = etcd_client.put('%s/name' % key_prefix, account_name)
+    r = etcd_client.put('%s/name' % key_prefix, owner_name)
 
-    if account_type == 'org':
+    if owner_type == 'org':
         r = etcd_client.put('%s/is_org' % key_prefix, '1')
     else:
         r = etcd_client.put('%s/is_org' % key_prefix, '')
 
-    return get_account(account_name)
+    return get_owner(owner_name)
 
 
-def update_account():
+def update_owner():
     pass
 
 
-def delete_account():
+def delete_owner():
     pass
 
 
