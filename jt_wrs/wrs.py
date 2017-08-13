@@ -2,7 +2,7 @@ import etcd3
 import uuid
 import requests
 import json
-from .exceptions import AccountNameNotFound, AMSNotAvailable
+from .exceptions import AccountNameNotFound, AMSNotAvailable, AccountIDNotFound
 
 # settings, need to move out to config
 
@@ -23,6 +23,19 @@ def _get_account_id_by_name(account_name):
         raise AccountNameNotFound(account_name)
 
     return json.loads(r.text).get('id')
+
+
+def _get_account_name_by_id(account_id):
+    request_url = '%s/accounts/account_id/%s' % (AMS_URL.strip('/'), account_id)
+    try:
+        r = requests.get(request_url)
+    except:
+        raise AMSNotAvailable('AMS service unavailable')
+
+    if r.status_code != 200:
+        raise AccountIDNotFound(account_id)
+
+    return json.loads(r.text).get('name')
 
 
 def _get_workflow_id_by_account_id_and_workflow_name(account_id, workflow_name):
@@ -57,7 +70,7 @@ def get_workflows(account_name=None, workflow_name=None, workflow_version=None):
 
             #print("k:%s, v:%s" % (k, v))
 
-            workflow = get_workflow_by_id(v, workflow_version)
+            workflow = get_workflow_by_id(v, workflow_version, workflow_owner=account_name)
 
             if workflow:
                 workflows.append(workflow)
@@ -67,7 +80,7 @@ def get_workflows(account_name=None, workflow_name=None, workflow_version=None):
         raise AccountNameNotFound(Exception("Specific account name not found: %s" % account_name))
 
 
-def get_workflow_by_id(workflow_id, workflow_version=None):
+def get_workflow_by_id(workflow_id, workflow_version=None, workflow_owner=None):
     workflow = {
         "id": workflow_id
     }
@@ -128,6 +141,10 @@ def get_workflow_by_id(workflow_id, workflow_version=None):
                 workflow[ver][sub_type].append({sub_key: new_value})
 
     if workflow_version_found:
+        if workflow_owner:
+            workflow['account.name'] = workflow_owner
+        else:
+            workflow['account.name'] = _get_account_name_by_id(workflow.get('account.id'))
         return workflow
 
 

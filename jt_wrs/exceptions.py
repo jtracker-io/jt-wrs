@@ -1,6 +1,13 @@
 __all__ = [
-    'AccountNameNotFound'
+    'AccountIDNotFound',
+    'AccountNameNotFound',
+    'AMSNotAvailable'
 ]
+
+
+class AccountIDNotFound(Exception):
+    def __str__(self):
+        return 'Account ID not found: %s' % (self.args[0])
 
 
 class AccountNameNotFound(Exception):
