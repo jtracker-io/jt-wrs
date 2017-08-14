@@ -17,8 +17,12 @@ def get_workflows(owner_name):
     return workflows or ('No workflow found', 404)
 
 
-def get_workflow_by_id(workflow_id, workflow_version=None):
-    return jt_wrs.get_workflow_by_id(workflow_id, workflow_version) or ('No workflow found', 404)
+def get_workflow_by_id_and_version(workflow_id, workflow_version=None):
+    return jt_wrs.get_workflow_by_id_and_version(workflow_id, workflow_version) or ('No workflow found', 404)
+
+
+def get_workflow_by_id(workflow_id):
+    return get_workflow_by_id_and_version(workflow_id) or ('No workflow found', 404)
 
 
 def get_workflow(owner_name, workflow_name):
@@ -49,6 +53,10 @@ def register_workflow(owner_name, owner_type='org'):
         return NoContent, 409
     else:
         return jt_wrs.create_owner(owner_name, owner_type)
+
+
+def register_workflow_version():
+    pass
 
 
 def release_workflow(owner_name, workflow_name, workflow_version):

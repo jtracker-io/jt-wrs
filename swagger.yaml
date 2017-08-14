@@ -11,21 +11,29 @@ security:
   # (only active if the TOKENINFO_URL environment variable is set)
   - oauth2: [uid]
 paths:
-  /workflows/workflow_id/{workflow_id}:
+  /workflows/_id/{workflow_id}:
     get:
       tags: [Workflows]
       operationId: app.get_workflow_by_id
       summary: Get workflow by workflow ID
       parameters:
         - $ref: '#/parameters/workflow_id'
-        - name: workflow_version
-          description: Workflow's version
-          in: query
-          type: string
-          pattern: "^[a-zA-Z0-9-_.]{2,30}$"
       responses:
         200:
-          description: Return workflows
+          description: Return workflow
+          schema:
+            type: array
+  /workflows/_id/{workflow_id}/_ver/{workflow_version}:
+    get:
+      tags: [Workflows]
+      operationId: app.get_workflow_by_id_and_version
+      summary: Get workflow by workflow ID and version
+      parameters:
+        - $ref: '#/parameters/workflow_id'
+        - $ref: '#/parameters/workflow_version'
+      responses:
+        200:
+          description: Return workflow
           schema:
             type: array
   /workflows/{owner_name}:
@@ -43,7 +51,7 @@ paths:
     post:
       tags: [Workflows]
       operationId: app.register_workflow
-      summary: Register a workflow under an owner
+      summary: Register a new workflow under an owner
       parameters:
         - $ref: '#/parameters/owner_name'
         - name: workflow
@@ -62,6 +70,16 @@ paths:
       tags: [Workflows]
       operationId: app.get_workflow
       summary: Get detail for a workflow (including all versions)
+      parameters:
+        - $ref: '#/parameters/owner_name'
+        - $ref: '#/parameters/workflow_name'
+      responses:
+        200:
+          description: Return workflow
+    post:
+      tags: [Workflows]
+      operationId: app.register_workflow_version
+      summary: Register a new version of a workflow
       parameters:
         - $ref: '#/parameters/owner_name'
         - $ref: '#/parameters/workflow_name'
@@ -149,7 +167,7 @@ parameters:
     in: path
     type: string
     required: true
-    pattern: "^[a-zA-Z0-9-_]{3,30}$"  # UUID pattern
+    pattern: "^[a-zA-Z]{1}[a-zA-Z0-9-_]{2,31}$"
   workflow_id:
     name: workflow_id
     description: Workflow's unique ID
@@ -163,14 +181,14 @@ parameters:
     in: path
     type: string
     required: true
-    pattern: "^[a-zA-Z0-9-_]{3,30}$"
+    pattern: "^[a-zA-Z]{1}[a-zA-Z0-9-_]{2,31}$"
   workflow_version:
     name: workflow_version
     description: Workflow's version
     in: path
     type: string
     required: true
-    pattern: "^[a-zA-Z0-9-_.]{2,30}$"
+    pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{1,15}$"
 
 
 definitions:
@@ -188,7 +206,7 @@ definitions:
       name:
         type: string
         description: Workflow's name
-        pattern: "^[a-zA-Z0-9-_]{3,30}$"
+        pattern: "^[a-zA-Z]{1}[a-zA-Z0-9-_]{2,31}$"
         example: "BWA-MEM"
         minLength: 3
         maxLength: 30
@@ -221,10 +239,10 @@ definitions:
       name:
         type: string
         description: Workflow's name
-        pattern: "^[a-zA-Z0-9-_]{3,35}$"
+        pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{2,35}$"
         example: "BWA-MEM"
         minLength: 3
-        maxLength: 35
+        maxLength: 36
 
 
 securityDefinitions:

@@ -26,7 +26,7 @@ def _get_owner_id_by_name(owner_name):
 
 
 def _get_owner_name_by_id(owner_id):
-    request_url = '%s/accounts/account_id/%s' % (AMS_URL.strip('/'), owner_id)
+    request_url = '%s/accounts/_account_id/%s' % (AMS_URL.strip('/'), owner_id)
     try:
         r = requests.get(request_url)
     except:
@@ -70,7 +70,7 @@ def get_workflows(owner_name=None, workflow_name=None, workflow_version=None):
 
             #print("k:%s, v:%s" % (k, v))
 
-            workflow = get_workflow_by_id(v, workflow_version, owner_name=owner_name)
+            workflow = get_workflow_by_id_and_version(v, workflow_version, owner_name=owner_name)
 
             if workflow:
                 workflows.append(workflow)
@@ -80,7 +80,7 @@ def get_workflows(owner_name=None, workflow_name=None, workflow_version=None):
         raise OwnerNameNotFound(Exception("Specific owner name not found: %s" % owner_name))
 
 
-def get_workflow_by_id(workflow_id, workflow_version=None, owner_name=None):
+def get_workflow_by_id_and_version(workflow_id, workflow_version=None, owner_name=None):
     workflow = {
         "id": workflow_id
     }
