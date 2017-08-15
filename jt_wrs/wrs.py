@@ -17,7 +17,7 @@ def _get_owner_id_by_name(owner_name):
     try:
         r = requests.get(request_url)
     except:
-        raise AMSNotAvailable('AMS service unavailable')
+        raise AMSNotAvailable('AMS service temporarily unavailable')
 
     if r.status_code != 200:
         raise OwnerNameNotFound(owner_name)
@@ -30,7 +30,7 @@ def _get_owner_name_by_id(owner_id):
     try:
         r = requests.get(request_url)
     except:
-        raise AMSNotAvailable('AMS service unavailable')
+        raise AMSNotAvailable('AMS service temporarily unavailable')
 
     if r.status_code != 200:
         raise OwnerIDNotFound(owner_id)
