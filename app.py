@@ -63,7 +63,7 @@ def release_workflow(owner_name, workflow_name, workflow_version):
     pass
 
 
-def validate_jobjson(owner_name, workflow_name, workflow_version, jobjson):
+def get_jobjson_template(owner_name, workflow_name, workflow_version, jobjson):
     pass
 
 

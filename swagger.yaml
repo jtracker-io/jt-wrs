@@ -140,25 +140,19 @@ paths:
           description: Workflow package downloaded
           schema:
             type: file
-  /workflows/{owner_name}/{workflow_name}/{workflow_version}/_validate_jobjson:
-    put:
+  /workflows/{owner_name}/{workflow_name}/{workflow_version}/_jobjson_template:
+    get:
       tags: [JobJSON]
-      operationId: app.validate_jobjson
-      summary: Validate the supplied JobJSON against a particular version of a workflow
+      operationId: app.get_jobjson_template
+      summary: Retrieve JobJSON template for a particular version of a workflow
       parameters:
         - $ref: '#/parameters/owner_name'
         - $ref: '#/parameters/workflow_name'
         - $ref: '#/parameters/workflow_version'
-        - name: jobjson
-          in: body
-          schema:
-            $ref: '#/definitions/JobJSON'
       responses:
         200:
-          description: JobJSON valid
-        400:
-          description: JobJSON invalid
-  /workflows/{owner_name}/{workflow_name}/{workflow_version}/_get_execution_plan:
+          description: JobJSON template returned
+  /workflows/{owner_name}/{workflow_name}/{workflow_version}/_job_execution_plan:
     put:
       tags: [JobJSON]
       operationId: app.get_execution_plan
@@ -169,6 +163,7 @@ paths:
         - $ref: '#/parameters/workflow_version'
         - name: jobjson
           in: body
+          required: true
           schema:
             $ref: '#/definitions/JobJSON'
       responses:

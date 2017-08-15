@@ -183,6 +183,10 @@ def get_workflow_package(owner_name, workflow_name, workflow_version):
     return get_file(owner_name, workflow_name, workflow_version, 'workflow_package')
 
 
+def get_jobjson_template(owner_name, workflow_name, workflow_version, jobjson):
+    pass
+
+
 def register_workflow(owner_name, owner_type):
     id = str(uuid.uuid4())
     pass
