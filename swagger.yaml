@@ -113,10 +113,10 @@ paths:
         200:
           description: Return workflows
   /workflows/{owner_name}/{workflow_name}/{workflow_version}/_validate_jobfile:
-    post:
+    put:
       tags: [Jobfile]
       operationId: app.validate_jobfile
-      summary: Update an owner
+      summary: Validate a jobfile against a particular version of a workflow
       parameters:
         - $ref: '#/parameters/owner_name'
         - $ref: '#/parameters/workflow_name'
@@ -134,7 +134,7 @@ paths:
     get:
       tags: [Workflows]
       operationId: app.download_workflowfile
-      summary: Download workflow file
+      summary: Download workflowfile for a particular version of a workflow
       parameters:
         - $ref: '#/parameters/owner_name'
         - $ref: '#/parameters/workflow_name'
@@ -146,7 +146,7 @@ paths:
     get:
       tags: [Workflows]
       operationId: app.download_workflow_package
-      summary: Download workflow package
+      summary: Download workflow package for a particular version of a workflow
       produces:
         - "application/octet-stream"
       parameters:
