@@ -18,26 +18,21 @@ class Workflow(object):
         self._update_dependency()
         #print json.dumps(self.workflow_tasks, indent=2)  # debug
 
-
     @property
     def name(self):
         return self._name
-
 
     @property
     def version(self):
         return self._version
 
-
     @property
     def workflow_dict(self):
         return self._workflow_dict
 
-
     @property
     def workflow_tasks(self):
         return self._workflow_tasks
-
 
     def _get_workflow_tasks(self):
         tasks = self.workflow_dict.get('workflow', {}).get('tasks', {})
@@ -95,12 +90,10 @@ class Workflow(object):
 
         self._workflow_tasks = tasks
 
-
     def _add_default_runtime_to_tools(self):
         for t in self.workflow_dict.get('tools', {}):
             if not 'runtime' in t:  # no runtime defined in the tool, add the default one
                 self.workflow_dict['tools'][t]['runtime'] = self.workflow_dict.get('workflow', {}).get('runtime')
-
 
     def _update_dependency(self):
         for task in self.workflow_tasks:
@@ -123,4 +116,3 @@ class Workflow(object):
                     self.workflow_tasks.get(task)['depends_on'] += list(dependency_to_add)
                 else:
                     self.workflow_tasks.get(task)['depends_on'] = list(dependency_to_add)
-

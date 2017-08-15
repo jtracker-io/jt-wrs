@@ -112,24 +112,6 @@ paths:
       responses:
         200:
           description: Return workflows
-  /workflows/{owner_name}/{workflow_name}/{workflow_version}/_validate_jobfile:
-    put:
-      tags: [Jobfile]
-      operationId: app.validate_jobfile
-      summary: Validate a jobfile against a particular version of a workflow
-      parameters:
-        - $ref: '#/parameters/owner_name'
-        - $ref: '#/parameters/workflow_name'
-        - $ref: '#/parameters/workflow_version'
-        - name: job_json
-          in: body
-          schema:
-            $ref: '#/definitions/JobFile'
-      responses:
-        200:
-          description: Job JSON valid
-        400:
-          description: Job JSON invalid
   /workflows/{owner_name}/{workflow_name}/{workflow_version}/_workflowfile:
     get:
       tags: [Workflows]
@@ -158,6 +140,42 @@ paths:
           description: Workflow package downloaded
           schema:
             type: file
+  /workflows/{owner_name}/{workflow_name}/{workflow_version}/_validate_jobjson:
+    put:
+      tags: [JobJSON]
+      operationId: app.validate_jobjson
+      summary: Validate the supplied JobJSON against a particular version of a workflow
+      parameters:
+        - $ref: '#/parameters/owner_name'
+        - $ref: '#/parameters/workflow_name'
+        - $ref: '#/parameters/workflow_version'
+        - name: jobjson
+          in: body
+          schema:
+            $ref: '#/definitions/JobJSON'
+      responses:
+        200:
+          description: JobJSON valid
+        400:
+          description: JobJSON invalid
+  /workflows/{owner_name}/{workflow_name}/{workflow_version}/_get_execution_plan:
+    put:
+      tags: [JobJSON]
+      operationId: app.get_execution_plan
+      summary: Generate a job execution plan for the supplied JobJSON against a particular version of a workflow
+      parameters:
+        - $ref: '#/parameters/owner_name'
+        - $ref: '#/parameters/workflow_name'
+        - $ref: '#/parameters/workflow_version'
+        - name: jobjson
+          in: body
+          schema:
+            $ref: '#/definitions/JobJSON'
+      responses:
+        200:
+          description: Job execution plan generated
+        400:
+          description: JobJSON invalid
 
 
 parameters:
@@ -225,10 +243,8 @@ definitions:
         description: Creation time
         example: "2015-07-07T15:49:51.230+02:00"
         readOnly: true
-  JobFile:
+  JobJSON:
     type: object
-    required:
-      - name
     properties:
       id:
         type: string
@@ -239,10 +255,10 @@ definitions:
       name:
         type: string
         description: Workflow's name
-        pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{2,35}$"
+        pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{2,63}$"
         example: "BWA-MEM"
         minLength: 3
-        maxLength: 36
+        maxLength: 64
 
 
 securityDefinitions:

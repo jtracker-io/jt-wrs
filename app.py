@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import connexion
+from connexion import NoContent
 import datetime
 import logging
 import jt_wrs
 from jt_wrs.exceptions import OwnerNameNotFound, AMSNotAvailable
-from connexion import NoContent
 
 
 def get_workflows(owner_name):
@@ -63,8 +63,16 @@ def release_workflow(owner_name, workflow_name, workflow_version):
     pass
 
 
-def validate_jobfile(owner_name, workflow_name, workflow_version):
+def validate_jobjson(owner_name, workflow_name, workflow_version, jobjson):
     pass
+
+
+def get_execution_plan(owner_name, workflow_name, workflow_version, jobjson):
+    try:
+        return jt_wrs.get_execution_plan(owner_name, workflow_name, workflow_version, jobjson) \
+               or ('JobJSON invalid', 400)
+    except NotImplementedError as err:
+        return str(err), 501
 
 
 def download_workflowfile(owner_name, workflow_name, workflow_version):

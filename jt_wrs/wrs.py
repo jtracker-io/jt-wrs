@@ -3,6 +3,8 @@ import uuid
 import requests
 import json
 from .exceptions import OwnerNameNotFound, AMSNotAvailable, OwnerIDNotFound
+from .jtracker import JTracker
+
 
 # settings, need to move out to config
 
@@ -183,19 +185,18 @@ def get_workflow_package(owner_name, workflow_name, workflow_version):
 
 def register_workflow(owner_name, owner_type):
     id = str(uuid.uuid4())
+    pass
 
-    key = '/'.join([AMS_ROOT, ACCOUNT_PATH, '%s:%s' % ('name', owner_name)])
-    r = etcd_client.put(key, id)
 
-    key_prefix = '/'.join([AMS_ROOT, ACCOUNT_PATH, 'data', '%s:%s' % ('id', id)])
-    r = etcd_client.put('%s/name' % key_prefix, owner_name)
+def get_execution_plan(owner_name, workflow_name, workflow_version, jobjson):
+    workflow = get_workflow(owner_name, workflow_name, workflow_version)
+    workflowfile = get_workflowfile(owner_name, workflow_name, workflow_version)
 
-    if owner_type == 'org':
-        r = etcd_client.put('%s/is_org' % key_prefix, '1')
+    if workflow.get('workflow_type') == 'JTracker':
+        jt = JTracker(workflow_yaml_string=workflowfile)
+        return jt.get_execution_plan(jobjson)
     else:
-        r = etcd_client.put('%s/is_org' % key_prefix, '')
-
-    return get_owner(owner_name)
+        raise NotImplementedError('Workflow types other than JTracker are not implemented yet')
 
 
 def update_owner():

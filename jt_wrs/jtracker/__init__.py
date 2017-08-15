@@ -1,21 +1,20 @@
-import yaml
+__version__ = "0.1.0-rc9"
+
 from .workflow import Workflow
+from .job import Job
 
 
 class JTracker(object):
-    def __init__(self, **kwargs):
-        self._workflow = Workflow(kwargs)
-
+    def __init__(self,  workflow_yaml_file=None, workflow_yaml_string=None):
+        self._workflow = Workflow(workflow_yaml_file=workflow_yaml_file, workflow_yaml_string=workflow_yaml_string)
 
     @property
     def workflow(self):
         return self._workflow
 
-
-    def validate_jobfile(self, jobfile):
+    def validate_jobjson(self, jobjson):
         pass
 
-
-    def generate_taskfiles(self, jobfile):
-        pass
-
+    def get_execution_plan(self, jobjson):
+        job = Job(self.workflow, jobjson)
+        return job.job_with_task_execution_plan
