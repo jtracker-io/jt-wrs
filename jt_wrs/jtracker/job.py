@@ -21,6 +21,7 @@ class Job(object):
     @lru_cache(maxsize=None)
     def job_with_task_execution_plan(self):
         tasks = []
+        scatter_tasks = dict()
         for task_name in self.workflow.workflow_tasks:  # workflow tasks defined to call tools
 
             call_input = self.workflow.workflow_tasks[task_name].get('input')
@@ -81,7 +82,14 @@ class Job(object):
                             updated_depends_on = []
                             for parent_call in original_depends_on:
                                 parts = parent_call.split('@')
+                                original_task_name = parts[1]
+                                if original_task_name not in scatter_tasks:
+                                    scatter_tasks[original_task_name] = set()
+
                                 parts[1] = '%s.%s' % (parts[1], task_suffix)
+
+                                scatter_tasks[original_task_name].add(parts[1])
+
                                 updated_depends_on.append('@'.join(parts))
 
                             task_dict['depends_on'] = updated_depends_on
@@ -120,15 +128,16 @@ class Job(object):
 
                 tasks.append(task_dict)
 
+        # TODO: scan all tasks to update dependent tasks that are scattered tasks
+        print(scatter_tasks)
+
         workflow_meta = {
             "language": "JTracker",
             "version": __version__,
         }
 
         job_with_task_execution_plan = deepcopy(self.jobjson)
-        job_with_task_execution_plan.update({
-            "tasks":tasks,
-            "workflow_meta": workflow_meta
-        })
+        job_with_task_execution_plan['tasks'] = tasks
+        job_with_task_execution_plan['workflow_meta'] = workflow_meta
 
         return job_with_task_execution_plan
