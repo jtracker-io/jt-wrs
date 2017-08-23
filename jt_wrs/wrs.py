@@ -28,7 +28,7 @@ def _get_owner_id_by_name(owner_name):
 
 
 def _get_owner_name_by_id(owner_id):
-    request_url = '%s/accounts/_account_id/%s' % (AMS_URL.strip('/'), owner_id)
+    request_url = '%s/accounts/_id/%s' % (AMS_URL.strip('/'), owner_id)
     try:
         r = requests.get(request_url)
     except:
