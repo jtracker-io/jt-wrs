@@ -7,7 +7,11 @@ import jt_wrs
 from jt_wrs.exceptions import OwnerNameNotFound, AMSNotAvailable
 
 
-def get_workflows(owner_name):
+def get_all_workflows():
+    return get_workflows() or ('No workflow found', 404)
+
+
+def get_workflows(owner_name=None):
     try:
         workflows = jt_wrs.get_workflows(owner_name)
     except OwnerNameNotFound as err:

@@ -11,7 +11,17 @@ security:
   # (only active if the TOKENINFO_URL environment variable is set)
   - oauth2: [uid]
 paths:
-  /workflows/_id/{workflow_id}:
+  /workflows:
+    get:
+      tags: [Workflows]
+      operationId: app.get_all_workflows
+      summary: Get all workflows
+      responses:
+        200:
+          description: Return list of workflows
+          schema:
+            type: array
+  /workflows/id/{workflow_id}:
     get:
       tags: [Workflows]
       operationId: app.get_workflow_by_id
@@ -23,7 +33,7 @@ paths:
           description: Return workflow
           schema:
             type: array
-  /workflows/_id/{workflow_id}/_ver/{workflow_version}:
+  /workflows/id/{workflow_id}/ver/{workflow_version}:
     get:
       tags: [Workflows]
       operationId: app.get_workflow_by_id_and_version
@@ -36,7 +46,7 @@ paths:
           description: Return workflow
           schema:
             type: array
-  /workflows/{owner_name}:
+  /owner/{owner_name}/workflows:
     get:
       tags: [Workflows]
       operationId: app.get_workflows
@@ -65,7 +75,7 @@ paths:
             $ref: '#/definitions/Workflow'
         409:
           description: Workflow registration failed
-  /workflows/{owner_name}/{workflow_name}:
+  /owner/{owner_name}/workflow/{workflow_name}:
     get:
       tags: [Workflows]
       operationId: app.get_workflow
@@ -86,7 +96,7 @@ paths:
       responses:
         200:
           description: Return workflow
-  /workflows/{owner_name}/{workflow_name}/{workflow_version}:
+  /owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}:
     get:
       tags: [Workflows]
       operationId: app.get_workflow_ver
@@ -100,7 +110,7 @@ paths:
           description: Return workflow
         404:
           description: Owner does not exist
-  /workflows/{owner_name}/{workflow_name}/{workflow_version}/_release:
+  /owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/release:
     put:
       tags: [Workflows]
       operationId: app.release_workflow
@@ -112,7 +122,7 @@ paths:
       responses:
         200:
           description: Return workflows
-  /workflows/{owner_name}/{workflow_name}/{workflow_version}/_workflowfile:
+  /owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/workflow_file:
     get:
       tags: [Workflows]
       operationId: app.download_workflowfile
@@ -124,7 +134,7 @@ paths:
       responses:
         200:
           description: Workflow file downloaded
-  /workflows/{owner_name}/{workflow_name}/{workflow_version}/_workflow_package:
+  /owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/workflow_package:
     get:
       tags: [Workflows]
       operationId: app.download_workflow_package
@@ -140,7 +150,7 @@ paths:
           description: Workflow package downloaded
           schema:
             type: file
-  /workflows/{owner_name}/{workflow_name}/{workflow_version}/_jobjson_template:
+  /owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/job_json_template:
     get:
       tags: [JobJSON]
       operationId: app.get_jobjson_template
@@ -152,7 +162,7 @@ paths:
       responses:
         200:
           description: JobJSON template returned
-  /workflows/{owner_name}/{workflow_name}/{workflow_version}/_job_execution_plan:
+  /owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/job_execution_plan:
     put:
       tags: [JobJSON]
       operationId: app.get_execution_plan
