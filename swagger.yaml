@@ -46,7 +46,7 @@ paths:
           description: Return workflow
           schema:
             type: array
-  /owner/{owner_name}/workflows:
+  /workflows/owner/{owner_name}:
     get:
       tags: [Workflows]
       operationId: app.get_workflows
@@ -75,7 +75,7 @@ paths:
             $ref: '#/definitions/Workflow'
         409:
           description: Workflow registration failed
-  /owner/{owner_name}/workflow/{workflow_name}:
+  /workflows/owner/{owner_name}/workflow/{workflow_name}:
     get:
       tags: [Workflows]
       operationId: app.get_workflow
@@ -96,7 +96,7 @@ paths:
       responses:
         200:
           description: Return workflow
-  /owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}:
+  /workflows/owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}:
     get:
       tags: [Workflows]
       operationId: app.get_workflow_ver
@@ -110,7 +110,7 @@ paths:
           description: Return workflow
         404:
           description: Owner does not exist
-  /owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/release:
+  /workflows/owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/release:
     put:
       tags: [Workflows]
       operationId: app.release_workflow
@@ -122,7 +122,7 @@ paths:
       responses:
         200:
           description: Return workflows
-  /owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/workflow_file:
+  /workflows/owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/workflow_file:
     get:
       tags: [Workflows]
       operationId: app.download_workflowfile
@@ -134,7 +134,7 @@ paths:
       responses:
         200:
           description: Workflow file downloaded
-  /owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/workflow_package:
+  /workflows/owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/workflow_package:
     get:
       tags: [Workflows]
       operationId: app.download_workflow_package
@@ -150,7 +150,7 @@ paths:
           description: Workflow package downloaded
           schema:
             type: file
-  /owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/job_json_template:
+  /workflows/owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/job_json_template:
     get:
       tags: [JobJSON]
       operationId: app.get_jobjson_template
@@ -162,7 +162,7 @@ paths:
       responses:
         200:
           description: JobJSON template returned
-  /owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/job_execution_plan:
+  /workflows/owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/job_execution_plan:
     put:
       tags: [JobJSON]
       operationId: app.get_execution_plan
