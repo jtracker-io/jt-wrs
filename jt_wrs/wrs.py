@@ -8,7 +8,7 @@ from .jtracker import JTracker
 
 # settings, need to move out to config
 
-AMS_URL = 'http://localhost:1206/api/jt-ams/v0.1'
+AMS_URL = 'http://localhost:12012/api/jt-ams/v0.1'
 WRS_ETCD_ROOT = '/jthub:wrs'
 
 etcd_client = etcd3.client()
