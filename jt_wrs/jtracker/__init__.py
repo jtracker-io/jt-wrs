@@ -12,9 +12,9 @@ class JTracker(object):
     def workflow(self):
         return self._workflow
 
-    def validate_jobjson(self, jobjson):
+    def validate_job_json(self, job_json):
         pass
 
-    def get_execution_plan(self, jobjson):
-        job = Job(self.workflow, jobjson)
+    def get_execution_plan(self, job_json):
+        job = Job(self.workflow, job_json)
         return job.job_with_task_execution_plan

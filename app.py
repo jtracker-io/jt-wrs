@@ -67,13 +67,13 @@ def release_workflow(owner_name, workflow_name, workflow_version):
     pass
 
 
-def get_jobjson_template(owner_name, workflow_name, workflow_version, jobjson):
+def get_job_json_template(owner_name, workflow_name, workflow_version, job_json):
     pass
 
 
-def get_execution_plan(owner_name, workflow_name, workflow_version, jobjson):
+def get_execution_plan(owner_name, workflow_name, workflow_version, job_json):
     try:
-        return jt_wrs.get_execution_plan(owner_name, workflow_name, workflow_version, jobjson) \
+        return jt_wrs.get_execution_plan(owner_name, workflow_name, workflow_version, job_json) \
                or ('JobJSON invalid', 400)
     except NotImplementedError as err:
         return str(err), 501

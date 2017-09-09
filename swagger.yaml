@@ -75,14 +75,17 @@ paths:
             $ref: '#/definitions/Workflow'
         409:
           description: Workflow registration failed
+  #/workflows/owner/{owner_name}/workflow/{workflow_name}/teams:
+  #  get:
+  #  post:
+  #/workflows/owner/{owner_name}/workflow/{workflow_name}/team/{team_name}:
+  #  get:
+  #  delete:
   /workflows/owner/{owner_name}/workflow/{workflow_name}:
     get:
       tags: [Workflows]
       operationId: app.get_workflow
       summary: Get detail for a workflow (including all versions)
-      parameters:
-        - $ref: '#/parameters/owner_name'
-        - $ref: '#/parameters/workflow_name'
       responses:
         200:
           description: Return workflow
@@ -90,12 +93,12 @@ paths:
       tags: [Workflows]
       operationId: app.register_workflow_version
       summary: Register a new version of a workflow
-      parameters:
-        - $ref: '#/parameters/owner_name'
-        - $ref: '#/parameters/workflow_name'
       responses:
         200:
           description: Return workflow
+    parameters:
+      - $ref: '#/parameters/owner_name'
+      - $ref: '#/parameters/workflow_name'
   /workflows/owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}:
     get:
       tags: [Workflows]
@@ -153,7 +156,7 @@ paths:
   /workflows/owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}/job_json_template:
     get:
       tags: [JobJSON]
-      operationId: app.get_jobjson_template
+      operationId: app.get_job_json_template
       summary: Retrieve JobJSON template for a particular version of a workflow
       parameters:
         - $ref: '#/parameters/owner_name'
@@ -171,7 +174,7 @@ paths:
         - $ref: '#/parameters/owner_name'
         - $ref: '#/parameters/workflow_name'
         - $ref: '#/parameters/workflow_version'
-        - name: jobjson
+        - name: job_json
           in: body
           required: true
           schema:

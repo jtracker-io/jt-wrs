@@ -5,17 +5,17 @@ from copy import deepcopy
 
 
 class Job(object):
-    def __init__(self, workflow, jobjson):
+    def __init__(self, workflow, job_json):
         self._workflow = workflow
-        self._jobjson = jobjson
+        self._job_json = job_json
 
     @property
     def workflow(self):
         return self._workflow
 
     @property
-    def jobjson(self):
-        return self._jobjson
+    def job_json(self):
+        return self._job_json
 
     @property
     @lru_cache(maxsize=None)
@@ -51,12 +51,12 @@ class Job(object):
                 with_items_field = scatter_setting.get('input').get(input_variable).get('with_items')
 
                 # the with_items_field must be in the original job JSON, at least for now
-                if not self.jobjson.get(with_items_field):
+                if not self.job_json.get(with_items_field):
                     # TODO: error out with clear error message
                     print('Error: can not find with_items field')
                 else:
                     task_suffix_set = set([])
-                    for item in self.jobjson.get(with_items_field):
+                    for item in self.job_json.get(with_items_field):
                         task_suffix = None
                         if isinstance(item, dict):
                             suffix_fields = task_suffix_field.split('.')
@@ -101,9 +101,9 @@ class Job(object):
                                 if call_input[i].split('.')[0] == input_variable:
                                     value = item.get(call_input[i].split('.')[1])
                                 else:
-                                    value = self.jobjson.get(call_input[i].split('.')[0]).get(call_input[i].split('.')[1])
+                                    value = self.job_json.get(call_input[i].split('.')[0]).get(call_input[i].split('.')[1])
                             else:
-                                value = self.jobjson.get(call_input[i])
+                                value = self.job_json.get(call_input[i])
 
                             task_dict['input'][i] = value
 
@@ -114,7 +114,7 @@ class Job(object):
                         task_dict['input'] = {}
                         task_dict['depends_on'] = depends_on
 
-                    if len(task_suffix_set) < len(self.jobjson.get(with_items_field)):
+                    if len(task_suffix_set) < len(self.job_json.get(with_items_field)):
                         print('duplicated task suffix detected')
 
             else:
@@ -122,7 +122,7 @@ class Job(object):
                     if '@' in call_input[i]:
                         value = '{{%s}}' % call_input[i]
                     else:
-                        value = self.jobjson.get(call_input[i])
+                        value = self.job_json.get(call_input[i])
 
                     task_dict['input'][i] = value
 
@@ -136,7 +136,7 @@ class Job(object):
             "version": __version__,
         }
 
-        job_with_task_execution_plan = deepcopy(self.jobjson)
+        job_with_task_execution_plan = deepcopy(self.job_json)
         job_with_task_execution_plan['tasks'] = tasks
         job_with_task_execution_plan['workflow_meta'] = workflow_meta
 

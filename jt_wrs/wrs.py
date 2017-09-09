@@ -192,13 +192,13 @@ def register_workflow(owner_name, owner_type):
     pass
 
 
-def get_execution_plan(owner_name, workflow_name, workflow_version, jobjson):
+def get_execution_plan(owner_name, workflow_name, workflow_version, job_json):
     workflow = get_workflow(owner_name, workflow_name, workflow_version)
     workflowfile = get_workflowfile(owner_name, workflow_name, workflow_version)
 
     if workflow.get('workflow_type') == 'JTracker':
         jt = JTracker(workflow_yaml_string=workflowfile)
-        return jt.get_execution_plan(jobjson)
+        return jt.get_execution_plan(job_json)
     else:
         raise NotImplementedError('Workflow types other than JTracker are not implemented yet')
 
