@@ -6,16 +6,16 @@ consumes:
   - application/json
 produces:
   - application/json
-security:
+#security:
   # enable OAuth protection for all REST endpoints
   # (only active if the TOKENINFO_URL environment variable is set)
-  - oauth2: [uid]
+#  - oauth2: [uid]
 paths:
   /workflows:
     get:
       tags: [Workflows]
       operationId: app.get_all_workflows
-      summary: Get all workflows
+      summary: Get all workflows (not implemented yet)
       responses:
         200:
           description: Return list of workflows
@@ -61,7 +61,7 @@ paths:
     post:
       tags: [Workflows]
       operationId: app.register_workflow
-      summary: Register a new workflow under an owner
+      summary: Register a new workflow under an owner (not implemented yet)
       parameters:
         - $ref: '#/parameters/owner_name'
         - name: workflow
@@ -86,19 +86,22 @@ paths:
       tags: [Workflows]
       operationId: app.get_workflow
       summary: Get detail for a workflow (including all versions)
+      parameters:
+        - $ref: '#/parameters/owner_name'
+        - $ref: '#/parameters/workflow_name'
       responses:
         200:
           description: Return workflow
     post:
       tags: [Workflows]
       operationId: app.register_workflow_version
-      summary: Register a new version of a workflow
+      summary: Register a new version of a workflow (not implemented yet)
       responses:
         200:
           description: Return workflow
-    parameters:
-      - $ref: '#/parameters/owner_name'
-      - $ref: '#/parameters/workflow_name'
+      parameters:
+        - $ref: '#/parameters/owner_name'
+        - $ref: '#/parameters/workflow_name'
   /workflows/owner/{owner_name}/workflow/{workflow_name}/ver/{workflow_version}:
     get:
       tags: [Workflows]
@@ -117,7 +120,7 @@ paths:
     put:
       tags: [Workflows]
       operationId: app.release_workflow
-      summary: Release a workflow, no change is permitted once released
+      summary: Release a workflow, no change is permitted once released (not implemented yet)
       parameters:
         - $ref: '#/parameters/owner_name'
         - $ref: '#/parameters/workflow_name'
@@ -141,7 +144,7 @@ paths:
     get:
       tags: [Workflows]
       operationId: app.download_workflow_package
-      summary: Download workflow package for a particular version of a workflow
+      summary: Download workflow package for a particular version of a workflow (not implemented yet)
       produces:
         - "application/octet-stream"
       parameters:
@@ -157,7 +160,7 @@ paths:
     get:
       tags: [JobJSON]
       operationId: app.get_job_json_template
-      summary: Retrieve JobJSON template for a particular version of a workflow
+      summary: Retrieve JobJSON template for a particular version of a workflow (not implemented yet)
       parameters:
         - $ref: '#/parameters/owner_name'
         - $ref: '#/parameters/workflow_name'
