@@ -51,16 +51,19 @@ def get_workflow_ver(owner_name, workflow_name, workflow_version):
     return workflow or ('No workflow found', 404)
 
 
-def register_workflow(owner_name, owner_type='org'):
-    exists = jt_wrs.get_owner(owner_name)
-    if exists:
-        return NoContent, 409
-    else:
-        return jt_wrs.create_owner(owner_name, owner_type)
+def register_workflow(owner_name, workflow_entry=None):
+    try:
+        return jt_wrs.register_workflow(owner_name, workflow_entry)
+    except:
+        return 'Failed registering workflow', 400
 
 
-def register_workflow_version():
+def delete_workflow(owner_name, workflow_name, worklow_version=None):
     pass
+
+
+def delete_workflow1(owner_name, workflow_name):
+    delete_workflow(owner_name, workflow_name)
 
 
 def release_workflow(owner_name, workflow_name, workflow_version):
