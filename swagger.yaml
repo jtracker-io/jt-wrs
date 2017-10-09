@@ -32,7 +32,7 @@ paths:
         200:
           description: Return workflow
           schema:
-            type: array
+            type: object
   /workflows/id/{workflow_id}/ver/{workflow_version}:
     get:
       tags: [Workflows]
@@ -45,7 +45,7 @@ paths:
         200:
           description: Return workflow
           schema:
-            type: array
+            type: object
   /workflows/owner/{owner_name}:
     get:
       tags: [Workflows]
@@ -114,6 +114,8 @@ paths:
       responses:
         200:
           description: Return workflow
+          schema:
+            type: object
         404:
           description: Owner does not exist
     delete:
