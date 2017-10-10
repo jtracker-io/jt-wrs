@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  title: JTHub Workflow Registration Service API
+  title: JTracker Workflow Registration Service API
   version: "0.1"
 consumes:
   - application/json

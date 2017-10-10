@@ -13,7 +13,7 @@ from .jtracker import JTracker
 # settings, need to move out to config
 
 AMS_URL = 'http://localhost:12012/api/jt-ams/v0.1'
-WRS_ETCD_ROOT = '/jthub:wrs'
+WRS_ETCD_ROOT = '/jt:wrs'
 
 etcd_client = etcd3.client()
 
@@ -233,7 +233,7 @@ def register_workflow(owner_name, workflow_entry):
         raise InvalidJTWorkflowFile
 
     # workflow entry etcd key
-    # /jthub:wrs/owner.id:7ebf7fa9-f70f-481a-a499-5fba3f8c5078/workflow/name:test/id
+    # /jt:wrs/owner.id:7ebf7fa9-f70f-481a-a499-5fba3f8c5078/workflow/name:test/id
     workflow_entry_etcd_key = '%s/owner.id:%s/workflow/name:%s/id' % (WRS_ETCD_ROOT,
                                                                       owner_id,  workflow_name)
     # check whether the workflow exists already and this is to register a new version
