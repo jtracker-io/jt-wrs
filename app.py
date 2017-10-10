@@ -54,8 +54,8 @@ def get_workflow_ver(owner_name, workflow_name, workflow_version):
 def register_workflow(owner_name, workflow_entry=None):
     try:
         return jt_wrs.register_workflow(owner_name, workflow_entry)
-    except:
-        return 'Failed registering workflow', 400
+    except Exception as err:
+        return 'Failed registering workflow: %s' % str(err), 400
 
 
 def delete_workflow(owner_name, workflow_name, worklow_version=None):

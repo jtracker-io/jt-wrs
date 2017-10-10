@@ -1,8 +1,12 @@
+import os
 import etcd3
+import zipfile
+import tempfile
+from io import BytesIO
 import uuid
 import requests
 import json
-from .exceptions import OwnerNameNotFound, AMSNotAvailable, OwnerIDNotFound
+from .exceptions import OwnerNameNotFound, AMSNotAvailable, OwnerIDNotFound, InvalidJTWorkflowFile
 from .jtracker import JTracker
 
 
@@ -188,7 +192,92 @@ def get_jobjson_template(owner_name, workflow_name, workflow_version, jobjson):
 
 
 def register_workflow(owner_name, workflow_entry):
-    return "Not implemented yet"
+    owner_id = _get_owner_id_by_name(owner_name)
+
+    # lots of validation/error check need to happen, do it later
+    workflow_name = workflow_entry.get('name')
+    workflow_version = workflow_entry.get('version')
+
+    # make sure same workflow name/version does not exist for the same owner
+    # not to allow this for now, later will need to consider user update a previously
+    # registered workflow but not yet released. Not change allowed once released
+    if get_workflow(owner_name, workflow_name, workflow_version):
+        raise Exception('Same workflow already registered.')
+
+    git_server = workflow_entry.get('git_server')
+    git_account = workflow_entry.get('git_account')
+    git_repo = workflow_entry.get('git_repo')
+    git_tag = workflow_entry.get('git_tag')
+    git_path = workflow_entry.get('git_path')
+
+    git_download_url = "%s/%s/%s/archive/%s.zip" % (git_server, git_account,
+                                                    git_repo, git_tag)
+
+    tmp_dir = tempfile.mkdtemp()
+    request = requests.get(git_download_url)
+    zfile = zipfile.ZipFile(BytesIO(request.content))
+    zfile.extractall(tmp_dir)
+
+    source_workflow_path = os.path.join(tmp_dir, '%s-%s' % (git_repo, git_tag), git_path, 'workflow')
+    workflow_file_name = '%s.jt.yaml' % workflow_name
+
+    with open(os.path.join(source_workflow_path, workflow_file_name), 'r') as f:
+        workflow_file_yaml = f.read()
+
+    try:  # validate workflow file by create a JT object
+        jt = JTracker(workflow_yaml_string=workflow_file_yaml)
+    except:
+        raise InvalidJTWorkflowFile
+
+    # workflow entry etcd key
+    # /jthub:wrs/owner.id:7ebf7fa9-f70f-481a-a499-5fba3f8c5078/workflow/name:test/id
+    workflow_entry_etcd_key = '%s/owner.id:%s/workflow/name:%s/id' % (WRS_ETCD_ROOT,
+                                                                      owner_id,  workflow_name)
+    # check whether the workflow exists already and this is to register a new version
+    v, meta = etcd_client.get(workflow_entry_etcd_key)
+    if v:
+        workflow_id = v.decode("utf-8")
+    else:
+        workflow_id = str(uuid.uuid4())
+
+    workflow_property_key_prefix = '%s/workflow/id:%s' % (WRS_ETCD_ROOT, workflow_id)
+
+    # now write to etcd
+    etcd_client.transaction(
+        compare=[
+            etcd_client.transactions.version(workflow_entry_etcd_key) > 0,  # test key exists
+        ],
+        success=[  # this is for additional new versions of the workflow
+            etcd_client.transactions.put('%s/ver:%s/%s' % (workflow_property_key_prefix,
+                                                           workflow_version, 'git_path'),
+                                         git_path),
+            etcd_client.transactions.put('%s/ver:%s/%s' % (workflow_property_key_prefix,
+                                                           workflow_version, 'git_tag'),
+                                         git_tag),
+            etcd_client.transactions.put('%s/ver:%s/%s' % (workflow_property_key_prefix,
+                                                           workflow_version, 'workflowfile'),
+                                         workflow_file_yaml)
+        ],
+        failure=[
+            etcd_client.transactions.put(workflow_entry_etcd_key, workflow_id),
+            etcd_client.transactions.put('%s/%s' % (workflow_property_key_prefix, 'workflow_type'), 'JTracker'),
+            etcd_client.transactions.put('%s/%s' % (workflow_property_key_prefix, 'git_account'), git_account),
+            etcd_client.transactions.put('%s/%s' % (workflow_property_key_prefix, 'git_repo'), git_repo),
+            etcd_client.transactions.put('%s/%s' % (workflow_property_key_prefix, 'name'), workflow_name),
+            etcd_client.transactions.put('%s/%s' % (workflow_property_key_prefix, 'owner.id'), owner_id),
+            etcd_client.transactions.put('%s/ver:%s/%s' % (workflow_property_key_prefix,
+                                                           workflow_version, 'git_path'),
+                                         git_path),
+            etcd_client.transactions.put('%s/ver:%s/%s' % (workflow_property_key_prefix,
+                                                           workflow_version, 'git_tag'),
+                                         git_tag),
+            etcd_client.transactions.put('%s/ver:%s/%s' % (workflow_property_key_prefix,
+                                                           workflow_version, 'workflowfile'),
+                                         workflow_file_yaml)
+        ]
+    )
+
+    return get_workflow(owner_name, workflow_name, workflow_version)
 
 
 def get_execution_plan(owner_name, workflow_name, workflow_version, job_json):

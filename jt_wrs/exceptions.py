@@ -1,7 +1,8 @@
 __all__ = [
     'OwnerIDNotFound',
     'OwnerNameNotFound',
-    'AMSNotAvailable'
+    'AMSNotAvailable',
+    'InvalidJTWorkflowFile'
 ]
 
 
@@ -18,3 +19,7 @@ class OwnerNameNotFound(Exception):
 class AMSNotAvailable(Exception):
     def __str__(self):
         return 'Owner Management Service temporarily not available'
+
+class InvalidJTWorkflowFile(Exception):
+    def __str__(self):
+        return 'Invalid JTracker Workflow File'
