@@ -210,6 +210,9 @@ def register_workflow(owner_name, workflow_entry):
     git_tag = workflow_entry.get('git_tag')
     git_path = workflow_entry.get('git_path')
 
+    if workflow_version != git_tag:  # we may need to relax this later
+        raise Exception('Workflow version must match git tag.')
+
     git_download_url = "%s/%s/%s/archive/%s.zip" % (git_server, git_account,
                                                     git_repo, git_tag)
 
