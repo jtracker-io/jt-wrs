@@ -11,16 +11,16 @@ produces:
   # (only active if the TOKENINFO_URL environment variable is set)
 #  - oauth2: [uid]
 paths:
-  /workflows:
-    get:
-      tags: [Workflows]
-      operationId: app.get_all_workflows
-      summary: Get all workflows (not implemented yet)
-      responses:
-        200:
-          description: Return list of workflows
-          schema:
-            type: array
+  #/workflows:
+  #  get:
+  #    tags: [Workflows]
+  #    operationId: app.get_all_workflows
+  #    summary: Get all workflows (not implemented yet)
+  #    responses:
+  #      200:
+  #        description: Return list of workflows
+  #        schema:
+  #          type: array
   /workflows/id/{workflow_id}:
     get:
       tags: [Workflows]
