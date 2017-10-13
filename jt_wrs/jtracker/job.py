@@ -22,6 +22,7 @@ class Job(object):
     def job_with_task_execution_plan(self):
         tasks = []
         scatter_tasks = dict()
+
         for task_name in self.workflow.workflow_tasks:  # workflow tasks defined to call tools
 
             call_input = self.workflow.workflow_tasks[task_name].get('input')
@@ -39,6 +40,7 @@ class Job(object):
 
             # need to find out whether this is a task with scatter call
             scatter_setting = self.workflow.workflow_tasks[task_name].get('scatter')
+
             if scatter_setting:
                 # TODO: if bad things happen here due to error in workflow definition or input Job JSON
                 #       we will need to be able to return proper error message
@@ -83,10 +85,13 @@ class Job(object):
                             for parent_call in original_depends_on:
                                 parts = parent_call.split('@')
                                 original_task_name = parts[1]
+
                                 if original_task_name not in scatter_tasks:
                                     scatter_tasks[original_task_name] = set()
 
-                                parts[1] = '%s.%s' % (parts[1], task_suffix)
+                                if self.workflow.workflow_tasks.get(original_task_name).get('scatter', {}).get('name') \
+                                        == scatter_setting.get('name'):  # parent task is in the current scatter path
+                                    parts[1] = '%s.%s' % (parts[1], task_suffix)
 
                                 scatter_tasks[original_task_name].add(parts[1])
 
@@ -96,14 +101,23 @@ class Job(object):
 
                         for i in call_input:
                             if '@' in call_input[i]:
-                                value = '{{%s.%s}}' % (call_input[i], task_suffix)
+                                parent_task_name = call_input[i].split('@')[1] if '@' in call_input[i] else None
+                                if parent_task_name and \
+                                            self.workflow.workflow_tasks.get(parent_task_name).\
+                                                    get('scatter', {}).get('name') == scatter_setting.get('name'):
+                                    value = '{{%s.%s}}' % (call_input[i], task_suffix)
+                                else:
+                                    value = '{{%s}}' % call_input[i]
                             elif len(call_input[i].split('.')) == 2:
                                 if call_input[i].split('.')[0] == input_variable:
                                     value = item.get(call_input[i].split('.')[1])
                                 else:
                                     value = self.job_json.get(call_input[i].split('.')[0]).get(call_input[i].split('.')[1])
                             else:
-                                value = self.job_json.get(call_input[i])
+                                if call_input[i] == input_variable:
+                                    value = item
+                                else:
+                                    value = self.job_json.get(call_input[i])
 
                             task_dict['input'][i] = value
 

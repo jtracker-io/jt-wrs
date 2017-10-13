@@ -210,7 +210,7 @@ def register_workflow(owner_name, workflow_entry):
     git_tag = workflow_entry.get('git_tag')
     git_path = workflow_entry.get('git_path')
 
-    if workflow_version != git_tag:  # we may need to relax this later
+    if workflow_version != git_tag and '%s.%s' % (workflow_name, workflow_version) != git_tag:
         raise Exception('Workflow version must match git tag.')
 
     git_download_url = "%s/%s/%s/archive/%s.zip" % (git_server, git_account,
@@ -222,14 +222,18 @@ def register_workflow(owner_name, workflow_entry):
     zfile.extractall(tmp_dir)
 
     source_workflow_path = os.path.join(tmp_dir, '%s-%s' % (git_repo, git_tag), git_path, 'workflow')
-    workflow_file_name = '%s.jt.yaml' % workflow_name
 
-    with open(os.path.join(source_workflow_path, workflow_file_name), 'r') as f:
-        workflow_file_yaml = f.read()
+    try:  # new convention
+        with open(os.path.join(source_workflow_path, 'main.yaml'), 'r') as f:
+            workflow_file_yaml = f.read()
+    except IOError:  # old naming of entry point workflow file
+        with open(os.path.join(source_workflow_path, '%s.jt.yaml' % workflow_name), 'r') as f:
+            workflow_file_yaml = f.read()
 
     try:  # validate workflow file by create a JT object
         jt = JTracker(workflow_yaml_string=workflow_file_yaml)
-    except:
+    except Exception as err:
+        print(str(err))
         raise InvalidJTWorkflowFile
 
     # workflow entry etcd key

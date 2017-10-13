@@ -1,4 +1,5 @@
 import yaml
+import json
 
 
 class Workflow(object):
@@ -16,7 +17,6 @@ class Workflow(object):
 
         self._add_default_runtime_to_tools()
         self._update_dependency()
-        #print json.dumps(self.workflow_tasks, indent=2)  # debug
 
     @property
     def name(self):
@@ -45,10 +45,11 @@ class Workflow(object):
         sub_tasks = {}
         for t in tasks:
             if '.' in t or '@' in t:
-                print("Workflow definition error: task name canot contain '.' or '@', offending name: '%s'" % t)
+                print("Workflow definition error: task name cannot contain '.' or '@', offending name: '%s'" % t)
                 raise
             if tasks[t].get('scatter'): # this is a scatter task
                 scatter_input = tasks[t].get('scatter', {}).get('input', {})
+                # print(t, tasks[t])
 
                 # quick way to verify the syntax is correct, more thorough validation is needed
                 # it's possible to support two level of nested scatter tasks,
@@ -61,7 +62,7 @@ class Workflow(object):
                 # expose sub tasks in scatter task to top level
                 for st in tasks[t].get('tasks', {}):
                     if '.' in t or '@' in st:
-                        print("Workflow definition error: task name canot contain '.' or '@', offending name: '%s'" % st)
+                        print("Workflow definition error: task name cannot contain '.' or '@', offending name: '%s'" % st)
                         raise
                     if sub_tasks.get(st):
                         print("Workflow definition error: task name duplication detected '%s'" % st)
@@ -105,12 +106,16 @@ class Workflow(object):
                     input_tasks.add('completed@%s' % input_.split('@')[1])
 
             existing_dependency = set([])
+            if not isinstance(self.workflow_tasks.get(task).get('depends_on'), list) and \
+                    self.workflow_tasks.get(task).get('depends_on') is not None:  # convert to list
+                print("'depends_on' must be set as list, not string or integer")
+                raise
+
             if self.workflow_tasks.get(task).get('depends_on'):
-                for parent_task in self.workflow_tasks.get(task).get('depends_on', []):
+                for parent_task in self.workflow_tasks.get(task).get('depends_on'):
                     existing_dependency.add('@'.join(parent_task.split('@')[:2]))
 
             dependency_to_add = input_tasks - existing_dependency
-
             if dependency_to_add:
                 if self.workflow_tasks.get(task).get('depends_on'):
                     self.workflow_tasks.get(task)['depends_on'] += list(dependency_to_add)
