@@ -48,7 +48,7 @@ class Job(object):
                 input_variable = list(scatter_setting.get('input').keys())[0]  # must always have one key (at least for
                 # now), will do error checking later
                 task_suffix_field = scatter_setting.get('input').get(input_variable).get('task_suffix')
-                if not task_suffix_field: task_suffix_field = input_variable
+                #if not task_suffix_field: task_suffix_field = input_variable
 
                 with_items_field = scatter_setting.get('input').get(input_variable).get('with_items')
 
@@ -58,20 +58,24 @@ class Job(object):
                     print('Error: can not find with_items field')
                 else:
                     task_suffix_set = set([])
+                    count = 0
+                    # TODO: before this, will this to verify uniqueness of all item values if suffix is defined
                     for item in self.job_json.get(with_items_field):
+                        count += 1
                         task_suffix = None
-                        if isinstance(item, dict):
-                            suffix_fields = task_suffix_field.split('.')
-                            if len(suffix_fields) != 2 or suffix_fields[0] != input_variable:
-                                print('Error: error in scatter call definition')
+                        if task_suffix_field:
+                            if isinstance(item, dict):
+                                suffix_fields = task_suffix_field.split('.')
+                                if len(suffix_fields) != 2 or suffix_fields[0] != input_variable:
+                                    print('Error: error in scatter call definition')
+                                else:
+                                    task_suffix = item.get(suffix_fields[1])
+                            elif isinstance(item, str) or isinstance(item, int):
+                               task_suffix = str(item)
                             else:
-                                task_suffix = item.get(suffix_fields[1])
-
-                        elif isinstance(item, str) or isinstance(item, int):
-                            task_suffix = str(item)
-
+                                print('Error: item from withitems field must be dict, string or int')
                         else:
-                            print('Error: item from withitems field must be dict, string or int')
+                            task_suffix = str(count)
 
                         task_suffix = re.sub('[^0-9a-zA-Z]+', '_', task_suffix)  # need to avoid special character
                         task_suffix_set.add(task_suffix)
