@@ -234,7 +234,6 @@ parameters:
     required: true
     pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{1,15}$"
 
-
 definitions:
   WorkflowEntry:
     type: object
@@ -245,14 +244,14 @@ definitions:
         type: string
         description: Workflow's name
         pattern: "^[a-zA-Z]{1}[a-zA-Z0-9-_]{2,31}$"
-        example: "test"
+        example: "webpage-word-count"
         minLength: 3
         maxLength: 30
       version:
         type: string
         description: Workflow's version
         pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{1,15}$"
-        example: "0.2.2"
+        example: "0.0.6"
       git_server:
         type: string
         description: Git server
@@ -265,16 +264,16 @@ definitions:
         type: string
         description: Git repository name
         pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_]{1,63}$"
-        example: "jtracker-example-workflows"
+        example: "demo-workflows"
       git_path:
         type: string
         description: Path in git repo to the workflow code
-        example: "test.jtracker"
+        example: "webpage-word-count"
       git_tag:
         type: string
         description: Git tag or commit
         pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{1,39}$"
-        example: "0.2.2"
+        example: "webpage-word-count.0.0.6"
       workflow_type:
         type: string
         description: In which language workflow is written
