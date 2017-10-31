@@ -147,7 +147,7 @@ class Job(object):
                 tasks.append(task_dict)
 
         # TODO: scan all tasks to update dependent tasks that are scattered tasks
-        print(scatter_tasks)
+        # print(scatter_tasks)
 
         workflow_meta = {
             "language": "JTracker",
