@@ -1,7 +1,7 @@
 from . import wrs
 from .exceptions import OwnerNameNotFound, AMSNotAvailable
 
-__version__ = '0.2.0a5'
+__version__ = '0.2.0a6'
 
 
 def get_all_workflows():
