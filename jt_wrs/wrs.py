@@ -12,15 +12,15 @@ from .jtracker import JTracker
 
 # settings, need to move out to config
 
-ams_host = os.environ['AMS_HOST'] if os.environ.get('AMS_HOST') else 'localhost'
-ams_port = os.environ['AMS_PORT'] if os.environ.get('AMS_PORT') else 12012
+ams_host = os.environ.get('AMS_HOST', 'localhost')
+ams_port = os.environ.get('AMS_PORT', 12012)
 AMS_URL = 'http://%s:%s/api/jt-ams/v0.1' % (ams_host, ams_port)
 
-WRS_ETCD_ROOT = '/jt:wrs'
-etcd_host = os.environ['ETCD_HOST'] if os.environ.get('ETCD_HOST') else 'localhost'
-etcd_port = os.environ['ETCD_PORT'] if os.environ.get('ETCD_PORT') else 2379
-
+etcd_host = os.environ.get('ETCD_HOST', 'localhost')
+etcd_port = os.environ.get('ETCD_PORT', 2379)
 etcd_client = etcd3.client(host=etcd_host, port=etcd_port)
+
+WRS_ETCD_ROOT = '/jt:wrs'
 
 
 def _get_owner_id_by_name(owner_name):
