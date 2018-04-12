@@ -259,7 +259,7 @@ definitions:
       git_account:
         type: string
         description: Git account name
-        example: "jthub"
+        example: "jtracker-io"
       git_repo:
         type: string
         description: Git repository name
