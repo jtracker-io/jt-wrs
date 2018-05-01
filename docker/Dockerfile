@@ -17,7 +17,6 @@ RUN curl -sSL -o tmp.tar.gz --retry 10 https://github.com/jtracker-io/jt-wrs/arc
     mkdir -p /srv/jt-wrs && \
     tar -C /srv/jt-wrs --strip-components 1 -zxf tmp.tar.gz && \
     apt-get -yqq install python3-pip && \
-    pip3 install --upgrade pip  && \
     pip3 install -r /srv/jt-wrs/requirements.txt
 
 CMD ["python3", "/srv/jt-wrs/app.py"]
