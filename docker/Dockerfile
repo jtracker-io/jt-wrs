@@ -13,7 +13,7 @@ USER root
 RUN apt-get -yqq update && \
     apt-get -yqq install curl
 
-RUN curl -sSL -o tmp.tar.gz --retry 10 https://github.com/jtracker-io/jt-wrs/archive/0.2.0a7.tar.gz && \
+RUN curl -sSL -o tmp.tar.gz --retry 10 https://github.com/jtracker-io/jt-wrs/archive/0.2.0a8.tar.gz && \
     mkdir -p /srv/jt-wrs && \
     tar -C /srv/jt-wrs --strip-components 1 -zxf tmp.tar.gz && \
     apt-get -yqq install python3-pip && \
