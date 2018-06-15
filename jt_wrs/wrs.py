@@ -70,7 +70,7 @@ def get_workflows(owner_name=None, workflow_name=None, workflow_version=None):
         else:
             key_search_prefix = '%sname' % workflow_name_id_prefix
 
-        r = etcd_client.get_prefix(key_prefix=key_search_prefix, sort_target='KEY')
+        r = etcd_client.get_prefix(key_prefix=key_search_prefix, sort_target='mod')
 
         for value, meta in r:
             k = meta.key.decode('utf-8').replace(workflow_name_id_prefix, '', 1)
@@ -99,7 +99,7 @@ def get_workflow_by_id_and_version(workflow_id, workflow_version=None, owner_nam
     # ideally we don't read values yet, but python-etcd does not have this option
     workflow_prefix = '/'.join([WRS_ETCD_ROOT, 'workflow', 'id:%s/' % workflow_id])
 
-    r2 = etcd_client.get_prefix(key_prefix=workflow_prefix, sort_target='KEY')
+    r2 = etcd_client.get_prefix(key_prefix=workflow_prefix, sort_target='mod')
 
     workflow_version_found = False
 
