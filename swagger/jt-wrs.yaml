@@ -19,8 +19,6 @@ paths:
   #    responses:
   #      200:
   #        description: Return list of workflows
-  #        schema:
-  #          type: array
   /workflows/id/{workflow_id}:
     get:
       tags: [Workflows]
@@ -56,8 +54,6 @@ paths:
       responses:
         200:
           description: Return workflows
-          schema:
-            type: array
     post:
       tags: [Workflows]
       operationId: jt_wrs.register_workflow
