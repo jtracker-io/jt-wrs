@@ -2,7 +2,7 @@ from . import __version__
 from functools import lru_cache
 import re
 from copy import deepcopy
-
+import json
 
 class Job(object):
     def __init__(self, workflow, job_json):
@@ -20,8 +20,13 @@ class Job(object):
     @property
     @lru_cache(maxsize=None)
     def job_with_task_execution_plan(self):
+        # TODO:
+        #      add missing input parameters in job JSON when the parameter is required and default value is provided
+        #      for parameters are file type, the file is considered workflow level identity and accessibility
+
         tasks = []
         scatter_tasks = dict()
+        #print(json.dumps(self.workflow.workflow_tasks, indent=2))
 
         for task_name in self.workflow.workflow_tasks:  # workflow tasks defined to call tools
 
@@ -157,5 +162,6 @@ class Job(object):
         job_with_task_execution_plan = deepcopy(self.job_json)
         job_with_task_execution_plan['tasks'] = tasks
         job_with_task_execution_plan['workflow_meta'] = workflow_meta
+        #print(json.dumps(job_with_task_execution_plan, indent=2))
 
         return job_with_task_execution_plan

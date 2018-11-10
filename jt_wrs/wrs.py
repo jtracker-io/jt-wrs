@@ -228,12 +228,15 @@ def register_workflow(owner_name, workflow_entry):
 
     source_workflow_path = os.path.join(tmp_dir, '%s-%s' % (git_repo, git_tag), git_path, 'workflow')
 
-    try:  # new convention
-        with open(os.path.join(source_workflow_path, 'main.yaml'), 'r') as f:
-            workflow_file_yaml = f.read()
-    except IOError:  # old naming of entry point workflow file
-        with open(os.path.join(source_workflow_path, '%s.jt.yaml' % workflow_name), 'r') as f:
-            workflow_file_yaml = f.read()
+    # load entry point workflow file
+    workflow_file_yaml = None
+    for ep in ['main.jt', 'main.yaml', '%s.jt.yaml' % workflow_name]:
+        try:
+            with open(os.path.join(source_workflow_path, ep), 'r') as f:
+                workflow_file_yaml = f.read()
+            break
+        except IOError:
+            continue  # if failed, try next one
 
     try:  # validate workflow file by create a JT object
         jt = JTracker(workflow_yaml_string=workflow_file_yaml)
