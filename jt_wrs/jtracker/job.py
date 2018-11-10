@@ -26,7 +26,7 @@ class Job(object):
 
         tasks = []
         scatter_tasks = dict()
-        #print(json.dumps(self.workflow.workflow_tasks, indent=2))
+        #print(json.dumps(self.workflow.workflow_dict, indent=2))
 
         for task_name in self.workflow.workflow_tasks:  # workflow tasks defined to call tools
 
@@ -46,6 +46,7 @@ class Job(object):
             # need to find out whether this is a task with scatter call
             scatter_setting = self.workflow.workflow_tasks[task_name].get('scatter')
 
+            # NOTE: once switched to generative approach to handle scatter tasks, this part will be dramatically simpler
             if scatter_setting:
                 # TODO: if bad things happen here due to error in workflow definition or input Job JSON
                 #       we will need to be able to return proper error message
