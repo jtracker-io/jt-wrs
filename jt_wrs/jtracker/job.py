@@ -17,9 +17,22 @@ class Job(object):
     def job_json(self):
         return self._job_json
 
+    def replace_job_template(self, workflow_input_obj, job_obj,default_pattern):
+        pattern = re.compile(default_pattern)
+        job_obj = self.job_json
+
+        for key in workflow_input_obj:
+            if isinstance(workflow_input_obj[key],dict):
+                if 'default' in workflow_input_obj[key]:
+                    if pattern.match(workflow_input_obj[key]['default']):
+                        job_obj[key] = pattern.sub(r'[${_wf_data}/\1]\2',workflow_input_obj[key]['default'])
+        return job_obj
+
     @property
     @lru_cache(maxsize=None)
     def job_with_task_execution_plan(self):
+        self._job_json = self.replace_job_template(self.workflow.workflow_dict.get('workflow').get('input'),self._job_json,"\[(.*?)\]+(.*?)")
+
         # TODO:
         #      add missing input parameters in job JSON when the parameter is required and default value is provided
         #      for parameters are file type, the file is considered workflow level identity and accessibility
