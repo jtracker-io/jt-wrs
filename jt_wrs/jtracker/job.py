@@ -17,12 +17,23 @@ class Job(object):
     def job_json(self):
         return self._job_json
 
+    def _add_missing_required_param(self):
+        workflow_input_def = self.workflow.workflow_dict.get('workflow').get('input')
+        pattern = re.compile("\[(.+)\](.+)")
+
+        for key in workflow_input_def:  # we cut some corner here for now to just take care of root level properties
+            if isinstance(workflow_input_def[key], dict):
+                if 'default' in workflow_input_def[key]:  # only use default when it's defined
+                    if key not in self.job_json:   # only add to job json when the param is not defined
+                        self.job_json[key] = workflow_input_def[key]['default']
+                        if pattern.match(self.job_json[key]):  # we check whether to insert system workflow data path
+                            self.job_json[key] = pattern.sub(r'[${_wf_data}/\1]\2', self.job_json[key])
+
     @property
     @lru_cache(maxsize=None)
     def job_with_task_execution_plan(self):
-        # TODO:
-        #      add missing input parameters in job JSON when the parameter is required and default value is provided
-        #      for parameters are file type, the file is considered workflow level identity and accessibility
+
+        self._add_missing_required_param()
 
         tasks = []
         scatter_tasks = dict()
@@ -157,12 +168,12 @@ class Job(object):
 
         workflow_meta = {
             "language": "JTracker",
-            "version": __version__,
+            "jt-wrs": __version__,
         }
 
         job_with_task_execution_plan = deepcopy(self.job_json)
         job_with_task_execution_plan['tasks'] = tasks
-        job_with_task_execution_plan['workflow_meta'] = workflow_meta
+        job_with_task_execution_plan['_workflow_meta'] = workflow_meta
         #print(json.dumps(job_with_task_execution_plan, indent=2))
 
         return job_with_task_execution_plan
