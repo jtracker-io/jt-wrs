@@ -168,12 +168,12 @@ class Job(object):
 
         workflow_meta = {
             "language": "JTracker",
-            "version": __version__,
+            "jt-wrs": __version__,
         }
 
         job_with_task_execution_plan = deepcopy(self.job_json)
         job_with_task_execution_plan['tasks'] = tasks
-        job_with_task_execution_plan['workflow_meta'] = workflow_meta
+        job_with_task_execution_plan['_workflow_meta'] = workflow_meta
         #print(json.dumps(job_with_task_execution_plan, indent=2))
 
         return job_with_task_execution_plan

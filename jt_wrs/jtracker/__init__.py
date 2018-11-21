@@ -1,5 +1,4 @@
-__version__ = "0.1.0-rc9"
-
+from ..__init__ import __version__
 from .workflow import Workflow
 from .job import Job
 
