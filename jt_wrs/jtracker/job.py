@@ -17,25 +17,23 @@ class Job(object):
     def job_json(self):
         return self._job_json
 
-    def replace_job_template(self, workflow_input_obj, job_obj,default_pattern):
-        pattern = re.compile(default_pattern)
-        job_obj = self.job_json
+    def _add_missing_required_param(self):
+        workflow_input_def = self.workflow.workflow_dict.get('workflow').get('input')
+        pattern = re.compile("\[(.+)\](.+)")
 
-        for key in workflow_input_obj:
-            if isinstance(workflow_input_obj[key],dict):
-                if 'default' in workflow_input_obj[key]:
-                    if pattern.match(workflow_input_obj[key]['default']):
-                        job_obj[key] = pattern.sub(r'[${_wf_data}/\1]\2',workflow_input_obj[key]['default'])
-        return job_obj
+        for key in workflow_input_def:  # we cut some corner here for now to just take care of root level properties
+            if isinstance(workflow_input_def[key], dict):
+                if 'default' in workflow_input_def[key]:  # only use default when it's defined
+                    if key not in self.job_json:   # only add to job json when the param is not defined
+                        self.job_json[key] = workflow_input_def[key]['default']
+                        if pattern.match(self.job_json[key]):  # we check whether to insert system workflow data path
+                            self.job_json[key] = pattern.sub(r'[${_wf_data}/\1]\2', self.job_json[key])
 
     @property
     @lru_cache(maxsize=None)
     def job_with_task_execution_plan(self):
-        self._job_json = self.replace_job_template(self.workflow.workflow_dict.get('workflow').get('input'),self._job_json,"\[(.*?)\]+(.*?)")
 
-        # TODO:
-        #      add missing input parameters in job JSON when the parameter is required and default value is provided
-        #      for parameters are file type, the file is considered workflow level identity and accessibility
+        self._add_missing_required_param()
 
         tasks = []
         scatter_tasks = dict()
