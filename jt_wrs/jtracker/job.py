@@ -26,16 +26,12 @@ class Job(object):
                 if 'default' in workflow_input_def[key]:  # only use default when it's defined
                     if key not in self.job_json:   # only add to job json when the param is not defined
                         self.job_json[key] = workflow_input_def[key]['default']
-                        if isinstance(self.job_json[key], str):
-                            if pattern.match(self.job_json[key]):  # we check whether to insert system workflow data path
-                                self.job_json[key] = pattern.sub(r'[${_wf_data}/\1]\2', self.job_json[key])
+                        if isinstance(self.job_json[key], str) and pattern.match(self.job_json[key]):  # we check whether to insert system workflow data path
+                            self.job_json[key] = pattern.sub(r'[${_wf_data}/\1]\2', self.job_json[key])
                         elif isinstance(self.job_json[key], list): # default is a list
                             for i in range(len(self.job_json[key])):
-                                if not isinstance(self.job_json[key][i], str): continue
-                                if pattern.match(self.job_json[key][i]):
+                                if isinstance(self.job_json[key][i], str) and pattern.match(self.job_json[key][i]):
                                     self.job_json[key][i] = pattern.sub(r'[${_wf_data}/\1]\2', self.job_json[key][i])
-                        else:
-                            print('Error: Unsupported default value in the workflow definition!')
 
     @property
     @lru_cache(maxsize=None)
