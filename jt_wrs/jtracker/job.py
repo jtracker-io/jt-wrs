@@ -158,12 +158,22 @@ class Job(object):
 
             else:
                 for i in call_input:
-                    if '@' in call_input[i]:
-                        value = '{{%s}}' % call_input[i]
-                    else:
-                        value = self.job_json.get(call_input[i])
+                    if not isinstance(call_input[i], list):
+                        if '@' in call_input[i]:
+                            value = '{{%s}}' % call_input[i]
+                        else:
+                            value = self.job_json.get(call_input[i])
 
-                    task_dict['input'][i] = value
+                        task_dict['input'][i] = value
+                    else:
+                        task_dict['input'][i] = []
+                        for j in call_input[i]:
+                            if '@' in j:
+                                value = '{{%s}}' % j
+                            else:
+                                value = self.job_json.get(j)
+
+                            task_dict['input'][i].append(value)
 
                 tasks.append(task_dict)
 

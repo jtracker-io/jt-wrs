@@ -102,8 +102,14 @@ class Workflow(object):
 
             for input_key in self.workflow_tasks.get(task).get('input'):
                 input_ = self.workflow_tasks.get(task).get('input').get(input_key)
-                if len(input_.split('@')) == 2:
-                    input_tasks.add('completed@%s' % input_.split('@')[1])
+                if isinstance(input_, list):
+                    inputs = input_
+                else:
+                    inputs = [input_]
+
+                for in_ in inputs:
+                    if len(in_.split('@')) == 2:
+                        input_tasks.add('completed@%s' % in_.split('@')[1])
 
             existing_dependency = set([])
             if not isinstance(self.workflow_tasks.get(task).get('depends_on'), list) and \
