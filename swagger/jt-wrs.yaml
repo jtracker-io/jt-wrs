@@ -207,7 +207,7 @@ parameters:
     in: path
     type: string
     required: true
-    pattern: "^[a-zA-Z]{1}[a-zA-Z0-9-_]{2,31}$"
+    pattern: "^[a-zA-Z]{1}[a-zA-Z0-9-_]{2,63}$"
   workflow_id:
     name: workflow_id
     description: Workflow's unique ID
@@ -221,14 +221,14 @@ parameters:
     in: path
     type: string
     required: true
-    pattern: "^[a-zA-Z]{1}[a-zA-Z0-9-_]{2,31}$"
+    pattern: "^[a-zA-Z]{1}[a-zA-Z0-9-_]{2,127}$"
   workflow_version:
     name: workflow_version
     description: Workflow's version
     in: path
     type: string
     required: true
-    pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{1,15}$"
+    pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{1,127}$"
 
 definitions:
   WorkflowEntry:
@@ -239,14 +239,14 @@ definitions:
       name:
         type: string
         description: Workflow's name
-        pattern: "^[a-zA-Z]{1}[a-zA-Z0-9-_]{2,31}$"
+        pattern: "^[a-zA-Z]{1}[a-zA-Z0-9-_]{2,127}$"
         example: "webpage-word-count"
         minLength: 3
         maxLength: 30
       version:
         type: string
         description: Workflow's version
-        pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{1,32}$"
+        pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{1,127}$"
         example: "0.0.8"
       git_server:
         type: string
@@ -259,7 +259,7 @@ definitions:
       git_repo:
         type: string
         description: Git repository name
-        pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_]{1,63}$"
+        pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_]{1,127}$"
         example: "demo-workflows"
       git_path:
         type: string
@@ -268,7 +268,7 @@ definitions:
       git_tag:
         type: string
         description: Git tag or commit
-        pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{1,39}$"
+        pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{1,127}$"
         example: "webpage-word-count.0.0.8"
       workflow_type:
         type: string
@@ -288,7 +288,7 @@ definitions:
       name:
         type: string
         description: Workflow's name
-        pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{2,63}$"
+        pattern: "^[a-zA-Z0-9]{1}[a-zA-Z0-9-_.]{2,127}$"
         example: "BWA-MEM"
         minLength: 3
         maxLength: 64
