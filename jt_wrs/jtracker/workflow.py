@@ -100,7 +100,7 @@ class Workflow(object):
         for task in self.workflow_tasks:
             input_tasks = set([])
 
-            for input_key in self.workflow_tasks.get(task).get('input'):
+            for input_key in self.workflow_tasks.get(task).get('input', {}):
                 input_ = self.workflow_tasks.get(task).get('input').get(input_key)
                 if isinstance(input_, list):
                     inputs = input_
