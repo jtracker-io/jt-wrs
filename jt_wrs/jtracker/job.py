@@ -45,7 +45,7 @@ class Job(object):
 
         for task_name in self.workflow.workflow_tasks:  # workflow tasks defined to call tools
 
-            call_input = self.workflow.workflow_tasks[task_name].get('input')
+            call_input = self.workflow.workflow_tasks[task_name].get('input', {})
 
             called_tool = self.workflow.workflow_tasks[task_name].get('tool')
             depends_on = self.workflow.workflow_tasks[task_name].get('depends_on')
